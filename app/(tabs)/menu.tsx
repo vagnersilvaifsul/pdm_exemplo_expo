@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-unresolved
 import { AuthContext } from "@/context/AuthProvider";
+import { router } from "expo-router";
 import React, { useContext, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Dialog, Divider, List, Text, useTheme } from "react-native-paper";
@@ -11,7 +12,7 @@ export default function Menu() {
 
 	async function handleSair() {
 		if (await sair()) {
-			//router.replace("/singIn"); //Veja a branch modulo1_preload para ver como isso está funcionando
+			router.replace("/signIn"); //Veja a branch modulo1_preload para ver como isso está funcionando
 		} else {
 			setDialogVisivel(true);
 		}

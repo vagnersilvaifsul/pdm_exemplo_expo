@@ -71,7 +71,7 @@ export default function Entrar() {
 
 	async function entrar(data: Credencial) {
 		setLogando(true);
-		const response = await signIn(data.email, data.senha);
+		const response = await signIn(data);
 		if (response === "ok") {
 			setLogando(false);
 			router.replace("/(tabs)/home");

@@ -59,7 +59,6 @@ export default function Entrar() {
 	const {
 		control,
 		handleSubmit,
-		register,
 		formState: { errors },
 	} = useForm<any>({
 		defaultValues: {
@@ -72,11 +71,8 @@ export default function Entrar() {
 
 	async function entrar(data: Credencial) {
 		setLogando(true);
-		console.log("Chamou entrar");
-		console.log(data);
 		const response = await signIn(data.email, data.senha);
 		if (response === "ok") {
-			console.log(response);
 			setLogando(false);
 			router.replace("/(tabs)");
 		} else {

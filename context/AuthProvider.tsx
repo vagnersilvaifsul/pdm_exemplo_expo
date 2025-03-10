@@ -4,7 +4,7 @@ import React, { createContext } from "react";
 import { firebaseConfig } from "../firebaseConfig";
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 
 export const AuthContext = createContext({});
 
@@ -12,13 +12,7 @@ export const AuthProvider = ({ children }: any) => {
 	async function signIn(email: string, senha: string) {
 		const auth = getAuth();
 		try {
-			const userCredential = await signInWithEmailAndPassword(
-				auth,
-				email,
-				senha
-			);
-			console.log(userCredential.user);
-			console.log(userCredential.user.email);
+			await signInWithEmailAndPassword(auth, email, senha);
 			return "ok";
 		} catch (error: any) {
 			console.error(error.code, error.message);

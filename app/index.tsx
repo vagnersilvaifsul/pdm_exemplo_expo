@@ -1,4 +1,5 @@
 import { AuthContext } from "@/context/AuthProvider";
+import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { Image, SafeAreaView, ScrollView, StyleSheet } from "react-native";
 import { Button, TextInput, useTheme } from "react-native-paper";
@@ -21,10 +22,10 @@ export default function Entrar() {
 		const response = await signIn(userAuth.email, userAuth.senha);
 		if (response === "ok") {
 			console.log(response);
+			router.replace("/(tabs)");
 		} else {
 			console.log(response);
 		}
-		//router.replace("/(tabs)");
 	}
 
 	return (

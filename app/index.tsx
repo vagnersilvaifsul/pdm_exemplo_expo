@@ -1,8 +1,29 @@
+import { initializeApp } from "firebase/app";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import { firebaseConfig } from "../firebaseConfig";
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
 export default function Entrar() {
 	async function entrar() {
 		console.log("Chamou entrar");
+		const auth = getAuth();
+		try {
+			const userCredential = await signInWithEmailAndPassword(
+				auth,
+				"teste@email.com",
+				"Teste123"
+			);
+			console.log(userCredential.user);
+			console.log(userCredential.user.email);
+			//router.replace("/(tabs)");
+		} catch (error: any) {
+			const errorCode = error.code;
+			const errorMessage = error.message;
+			console.log(errorCode, errorMessage);
+		}
 	}
 
 	return (

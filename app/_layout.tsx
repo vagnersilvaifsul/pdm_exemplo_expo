@@ -45,6 +45,7 @@ export default function RootLayout() {
 						headerShown: false,
 					}}
 				>
+					<Stack.Screen name="signIn" />
 					<Stack.Screen name="signUp" />
 					<Stack.Screen name="recuperarSenha" />
 				</Stack>

@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import React, { createContext } from "react";
 import { firebaseConfig } from "../firebaseConfig";
 
@@ -9,10 +9,21 @@ initializeApp(firebaseConfig);
 export const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }: any) => {
-	async function signIn(email: string, senha: string) {
-		const auth = getAuth();
+	const auth = getAuth();
+
+	async function signIn(email: string, senha: string): Promise<string> {
 		try {
 			await signInWithEmailAndPassword(auth, email, senha);
+			return "ok";
+		} catch (error: any) {
+			console.error(error.code, error.message);
+			return launchServerMessageErro(error);
+		}
+	}
+
+	async function sair(): Promise<string> {
+		try {
+			await signOut(auth);
 			return "ok";
 		} catch (error: any) {
 			console.error(error.code, error.message);
@@ -41,6 +52,8 @@ export const AuthProvider = ({ children }: any) => {
 	}
 
 	return (
-		<AuthContext.Provider value={{ signIn }}>{children}</AuthContext.Provider>
+		<AuthContext.Provider value={{ signIn, sair }}>
+			{children}
+		</AuthContext.Provider>
 	);
 };

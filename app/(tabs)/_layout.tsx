@@ -33,6 +33,15 @@ export default function TabLayout() {
 					),
 				}}
 			/>
+			<Tabs.Screen
+				name="menu"
+				options={{
+					title: "Menu",
+					tabBarIcon: ({ color }) => (
+						<Icon source="menu" color={theme.colors.primary} size={20} />
+					),
+				}}
+			/>
 		</Tabs>
 	);
 }

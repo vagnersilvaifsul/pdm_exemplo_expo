@@ -39,7 +39,7 @@ export default function RootLayout() {
 					headerShown: false,
 				}}
 			>
-				<Stack.Screen name="Entrar" />
+				{/* <Stack.Screen name="entrar" /> */}
 			</Stack>
 		</ThemeProvider>
 	);

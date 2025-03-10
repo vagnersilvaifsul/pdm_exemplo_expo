@@ -45,7 +45,7 @@ export default function RootLayout() {
 						headerShown: false,
 					}}
 				>
-					{/* <Stack.Screen name="entrar" /> */}
+					<Stack.Screen name="signUp" />
 				</Stack>
 			</AuthProvider>
 		</PaperProvider>

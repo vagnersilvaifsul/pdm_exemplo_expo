@@ -4,8 +4,21 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Image, SafeAreaView, ScrollView, StyleSheet } from "react-native";
-import { Button, Dialog, Text, TextInput, useTheme } from "react-native-paper";
+import {
+	Image,
+	SafeAreaView,
+	ScrollView,
+	StyleSheet,
+	View,
+} from "react-native";
+import {
+	Button,
+	Dialog,
+	Divider,
+	Text,
+	TextInput,
+	useTheme,
+} from "react-native-paper";
 import * as yup from "yup";
 
 const requiredMessage = "Campo obrigatório";
@@ -153,6 +166,18 @@ export default function Entrar() {
 					>
 						{!logando ? "Entrar" : "Entrando"}
 					</Button>
+					<Divider />
+					<View style={styles.divCadastro}>
+						<Text variant="labelMedium">Não tem uma conta?</Text>
+						<Text
+							style={{ ...styles.textCadastro, color: theme.colors.tertiary }}
+							variant="labelMedium"
+							onPress={() => router.push("/signUp")}
+						>
+							{" "}
+							Cadastre-se.
+						</Text>
+					</View>
 				</>
 			</ScrollView>
 			<Dialog visible={dialogVisivel} onDismiss={() => setDialogVisivel(false)}>
@@ -197,4 +222,10 @@ const styles = StyleSheet.create({
 	textError: {
 		width: 350,
 	},
+	divCadastro: {
+		marginTop: 20,
+		flexDirection: "row",
+		justifyContent: "center",
+	},
+	textCadastro: {},
 });

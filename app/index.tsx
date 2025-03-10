@@ -1,8 +1,10 @@
 import { AuthContext } from "@/context/AuthProvider";
 import { useContext } from "react";
-import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import { Image, SafeAreaView, ScrollView, StyleSheet } from "react-native";
+import { useTheme } from "react-native-paper";
 
 export default function Entrar() {
+	const theme = useTheme();
 	const { signIn } = useContext<any>(AuthContext);
 
 	async function entrar() {
@@ -17,11 +19,18 @@ export default function Entrar() {
 	}
 
 	return (
-		<View style={styles.container}>
-			<TouchableHighlight style={styles.button} onPress={entrar}>
-				<Text style={styles.text}>Entrar</Text>
-			</TouchableHighlight>
-		</View>
+		<SafeAreaView
+			style={{ ...styles.container, backgroundColor: theme.colors.background }}
+		>
+			<ScrollView>
+				<>
+					<Image
+						style={styles.image}
+						source={require("../assets/images/logo512.png")}
+					/>
+				</>
+			</ScrollView>
+		</SafeAreaView>
 	);
 }
 
@@ -29,20 +38,13 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		alignItems: "center",
-		justifyContent: "center",
 	},
-	text: {
-		fontSize: 20,
-		fontWeight: "bold",
-		color: "white",
-	},
-	button: {
-		backgroundColor: "#f194ff",
-		fontSize: 20,
-		fontWeight: "bold",
-		width: 100,
-		height: 50,
-		alignItems: "center",
-		justifyContent: "center",
+	image: {
+		width: 200,
+		height: 200,
+		alignSelf: "center",
+		borderRadius: 200 / 2,
+		marginTop: 100,
+		marginBottom: 40,
 	},
 });

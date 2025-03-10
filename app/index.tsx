@@ -1,15 +1,24 @@
 import { AuthContext } from "@/context/AuthProvider";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Image, SafeAreaView, ScrollView, StyleSheet } from "react-native";
-import { useTheme } from "react-native-paper";
+import { Button, TextInput, useTheme } from "react-native-paper";
+
+type UserAuth = {
+	email: string;
+	senha: string;
+};
 
 export default function Entrar() {
 	const theme = useTheme();
 	const { signIn } = useContext<any>(AuthContext);
+	const [userAuth, setUserAuth] = useState<UserAuth>({ email: "", senha: "" });
+	const [exibirSenha, setExibirSenha] = useState(true);
+	const [logando, setLogando] = useState(false);
 
 	async function entrar() {
 		console.log("Chamou entrar");
-		const response = await signIn("teste@email.com", "Teste123");
+		console.log(userAuth);
+		const response = await signIn(userAuth.email, userAuth.senha);
 		if (response === "ok") {
 			console.log(response);
 		} else {
@@ -28,6 +37,47 @@ export default function Entrar() {
 						style={styles.image}
 						source={require("../assets/images/logo512.png")}
 					/>
+					<TextInput
+						style={styles.textinput}
+						label="Email"
+						placeholder="Digite seu email"
+						mode="outlined"
+						autoCapitalize="none"
+						returnKeyType="next"
+						keyboardType="email-address"
+						onChangeText={(t) => setUserAuth({ ...userAuth, email: t })}
+						value={userAuth.email}
+						right={<TextInput.Icon icon="email" />}
+					/>
+					<TextInput
+						style={styles.textinput}
+						label="Senha"
+						placeholder="Digite sua senha"
+						mode="outlined"
+						autoCapitalize="none"
+						returnKeyType="go"
+						secureTextEntry={exibirSenha}
+						onChangeText={(t) => setUserAuth({ ...userAuth, senha: t })}
+						value={userAuth.senha}
+						right={
+							<TextInput.Icon
+								icon="eye"
+								color={
+									exibirSenha ? theme.colors.onBackground : theme.colors.error
+								}
+								onPress={() => setExibirSenha((previus) => !previus)}
+							/>
+						}
+					/>
+					<Button
+						style={styles.button}
+						mode="contained"
+						onPress={entrar}
+						loading={logando}
+						disabled={logando}
+					>
+						{!logando ? "Entrar" : "Entrando"}
+					</Button>
 				</>
 			</ScrollView>
 		</SafeAreaView>
@@ -46,5 +96,15 @@ const styles = StyleSheet.create({
 		borderRadius: 200 / 2,
 		marginTop: 100,
 		marginBottom: 40,
+	},
+	textinput: {
+		width: 350,
+		height: 50,
+		marginTop: 20,
+		backgroundColor: "transparent",
+	},
+	button: {
+		marginTop: 50,
+		marginBottom: 30,
 	},
 });

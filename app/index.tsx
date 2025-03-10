@@ -2,7 +2,7 @@ import { AuthContext } from "@/context/AuthProvider";
 import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { Image, SafeAreaView, ScrollView, StyleSheet } from "react-native";
-import { Button, TextInput, useTheme } from "react-native-paper";
+import { Button, Dialog, Text, TextInput, useTheme } from "react-native-paper";
 
 type UserAuth = {
 	email: string;
@@ -15,6 +15,8 @@ export default function Entrar() {
 	const [userAuth, setUserAuth] = useState<UserAuth>({ email: "", senha: "" });
 	const [exibirSenha, setExibirSenha] = useState(true);
 	const [logando, setLogando] = useState(false);
+	const [dialogVisivel, setDialogVisivel] = useState(false);
+	const [mensagemDialog, setMensagemDialog] = useState("");
 
 	async function entrar() {
 		console.log("Chamou entrar");
@@ -24,7 +26,8 @@ export default function Entrar() {
 			console.log(response);
 			router.replace("/(tabs)");
 		} else {
-			console.log(response);
+			setMensagemDialog(response);
+			setDialogVisivel(true);
 		}
 	}
 
@@ -81,6 +84,15 @@ export default function Entrar() {
 					</Button>
 				</>
 			</ScrollView>
+			<Dialog visible={dialogVisivel} onDismiss={() => setDialogVisivel(false)}>
+				<Dialog.Icon icon="alert-circle-outline" size={60} />
+				<Dialog.Title style={styles.textDialog}>Erro</Dialog.Title>
+				<Dialog.Content>
+					<Text style={styles.textDialog} variant="bodyLarge">
+						{mensagemDialog}
+					</Text>
+				</Dialog.Content>
+			</Dialog>
 		</SafeAreaView>
 	);
 }
@@ -107,5 +119,8 @@ const styles = StyleSheet.create({
 	button: {
 		marginTop: 50,
 		marginBottom: 30,
+	},
+	textDialog: {
+		textAlign: "center",
 	},
 });

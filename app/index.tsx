@@ -157,6 +157,16 @@ export default function Entrar() {
 							{errors.senha?.message?.toString()}
 						</Text>
 					)}
+					<Text
+						style={{
+							...styles.textEsqueceuSenha,
+							color: theme.colors.tertiary,
+						}}
+						variant="labelMedium"
+						onPress={() => router.push("/recuperarSenha")}
+					>
+						Esqueceu sua senha?
+					</Text>
 					<Button
 						style={styles.button}
 						mode="contained"
@@ -228,4 +238,8 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	textCadastro: {},
+	textEsqueceuSenha: {
+		alignSelf: "flex-end",
+		marginTop: 20,
+	},
 });

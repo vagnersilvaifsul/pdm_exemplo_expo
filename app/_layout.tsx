@@ -46,6 +46,7 @@ export default function RootLayout() {
 					}}
 				>
 					<Stack.Screen name="signUp" />
+					<Stack.Screen name="recuperarSenha" />
 				</Stack>
 			</AuthProvider>
 		</PaperProvider>

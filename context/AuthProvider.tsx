@@ -9,13 +9,13 @@ const app = initializeApp(firebaseConfig);
 export const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }: any) => {
-	async function signIn() {
+	async function signIn(email: string, senha: string) {
 		const auth = getAuth();
 		try {
 			const userCredential = await signInWithEmailAndPassword(
 				auth,
-				"teste@email.com",
-				"Teste123"
+				email,
+				senha
 			);
 			console.log(userCredential.user);
 			console.log(userCredential.user.email);

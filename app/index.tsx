@@ -7,7 +7,7 @@ export default function Entrar() {
 
 	async function entrar() {
 		console.log("Chamou entrar");
-		const response = await signIn();
+		const response = await signIn("teste@email.com", "Teste123");
 		if (response === "ok") {
 			console.log(response);
 		} else {

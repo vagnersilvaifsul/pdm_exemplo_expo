@@ -1,17 +1,26 @@
 import { Credencial } from "@/model/types";
+import { Usuario } from "@/model/Usuario";
 import * as SecureStore from "expo-secure-store";
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+	createUserWithEmailAndPassword,
+	getAuth,
+	sendEmailVerification,
+	signInWithEmailAndPassword,
+	signOut,
+} from "firebase/auth";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
 import React, { createContext } from "react";
 import { firebaseConfig } from "../firebaseConfig";
 
 // Initialize Firebase
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
 export const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }: any) => {
-	const auth = getAuth();
+	const auth = getAuth(app);
+	const firestore = getFirestore(app);
 
 	/*
     Cache criptografado do usuário
@@ -39,6 +48,41 @@ export const AuthProvider = ({ children }: any) => {
 		} catch (e) {
 			console.error("AuthProvider, recuperaCredencialdaCache: " + e);
 			return null;
+		}
+	}
+
+	/*
+    Funções do processo de Autenticação
+  */
+	async function signUp(usuario: Usuario): Promise<string> {
+		try {
+			if (usuario.email && usuario.senha) {
+				await createUserWithEmailAndPassword(
+					auth,
+					usuario.email,
+					usuario.senha
+				);
+				if (auth.currentUser) {
+					await sendEmailVerification(auth.currentUser);
+				}
+				//A senha não deve ser persistida no serviço Firetore, ela é gerida pelo serviço Authentication
+				const usuarioFirestore = {
+					email: usuario.email,
+					nome: usuario.nome,
+					urlFoto: usuario.urlFoto,
+					curso: usuario.curso,
+					perfil: usuario.perfil,
+				};
+				await addDoc(collection(firestore, "users"), {
+					usuarioFirestore,
+				});
+			} else {
+				return "Confira se você digitou o email e a senha.";
+			}
+			return "ok";
+		} catch (e: any) {
+			console.error(e.code, e.message);
+			return launchServerMessageErro(e);
 		}
 	}
 
@@ -89,7 +133,9 @@ export const AuthProvider = ({ children }: any) => {
 	}
 
 	return (
-		<AuthContext.Provider value={{ signIn, sair, recuperaCredencialdaCache }}>
+		<AuthContext.Provider
+			value={{ signIn, sair, recuperaCredencialdaCache, signUp }}
+		>
 			{children}
 		</AuthContext.Provider>
 	);

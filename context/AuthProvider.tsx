@@ -9,7 +9,7 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 } from "firebase/auth";
-import { addDoc, collection, getFirestore } from "firebase/firestore";
+import { doc, getFirestore, setDoc } from "firebase/firestore";
 import React, { createContext } from "react";
 import { firebaseConfig } from "../firebaseConfig";
 
@@ -57,13 +57,13 @@ export const AuthProvider = ({ children }: any) => {
 	async function signUp(usuario: Usuario): Promise<string> {
 		try {
 			if (usuario.email && usuario.senha) {
-				await createUserWithEmailAndPassword(
+				const userCredential = await createUserWithEmailAndPassword(
 					auth,
 					usuario.email,
 					usuario.senha
 				);
-				if (auth.currentUser) {
-					await sendEmailVerification(auth.currentUser);
+				if (userCredential) {
+					await sendEmailVerification(userCredential.user);
 				}
 				//A senha não deve ser persistida no serviço Firetore, ela é gerida pelo serviço Authentication
 				const usuarioFirestore = {
@@ -73,9 +73,10 @@ export const AuthProvider = ({ children }: any) => {
 					curso: usuario.curso,
 					perfil: usuario.perfil,
 				};
-				await addDoc(collection(firestore, "users"), {
-					usuarioFirestore,
-				});
+				await setDoc(
+					doc(firestore, "usuarios", userCredential.user.uid),
+					usuarioFirestore
+				);
 			} else {
 				return "Confira se você digitou o email e a senha.";
 			}

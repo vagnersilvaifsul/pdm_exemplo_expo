@@ -88,11 +88,14 @@ export const AuthProvider = ({ children }: any) => {
 
 	async function signIn(credencial: Credencial): Promise<string> {
 		try {
-			await signInWithEmailAndPassword(
+			const userCredencial = await signInWithEmailAndPassword(
 				auth,
 				credencial.email,
 				credencial.senha
 			);
+			if (!userCredencial.user.emailVerified) {
+				return "Você precisa verificar seu email para continuar.";
+			}
 			armazenaCredencialnaCache(credencial);
 			return "ok";
 		} catch (error: any) {

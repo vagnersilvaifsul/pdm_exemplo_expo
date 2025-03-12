@@ -50,7 +50,7 @@ export default function PerfilTela({ navigation }: any) {
 	const [dialogErroVisivel, setDialogErroVisivel] = useState(false);
 	const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
 	const [mensagem, setMensagem] = useState({ tipo: "", mensagem: "" });
-	const { update } = useContext(UserContext);
+	const { update, del } = useContext(UserContext);
 
 	useEffect(() => {}, []);
 
@@ -80,7 +80,18 @@ export default function PerfilTela({ navigation }: any) {
 	}
 
 	async function excluirConta() {
-		alert("Desenvolver a comunicação com o BaaS para o delete do perfil");
+		setDialogExcluirVisivel(false);
+		setRequisitando(true);
+		setExcluindo(true);
+		const msg = await del(usuerFirebase.uid);
+		if (msg === "ok") {
+			router.replace("/signIn");
+		} else {
+			setMensagem({ tipo: "erro", mensagem: "ops! algo deu errado" });
+			setDialogErroVisivel(true);
+			setRequisitando(false);
+			setExcluindo(false);
+		}
 	}
 
 	return (

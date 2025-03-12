@@ -1,13 +1,13 @@
 import { firestore } from "@/firebase/firebaseInit";
 import { Usuario } from "@/model/Usuario";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 
 export const UserContext = createContext({});
 
 export const UserProvider = ({ children }: any) => {
-	const { userAuth } = useContext(AuthContext);
+	const { userAuth, delAccount } = useContext(AuthContext);
 	const [usuerFirebase, setUserFirebase] = useState<Usuario | null>(null);
 
 	useEffect(() => {
@@ -25,6 +25,7 @@ export const UserProvider = ({ children }: any) => {
 			const docSnap = await getDoc(
 				doc(firestore, "usuarios", userAuth.user.uid)
 			);
+			console.log(docSnap.data());
 			if (docSnap.exists()) {
 				let userData = docSnap.data();
 				const usuario: Usuario = {
@@ -36,6 +37,7 @@ export const UserProvider = ({ children }: any) => {
 					perfil: userData.perfil,
 				};
 				setUserFirebase(usuario);
+				console.log(usuario);
 			}
 		} catch (e) {
 			console.error("UserProvider, getUser: " + e);
@@ -55,8 +57,19 @@ export const UserProvider = ({ children }: any) => {
 		}
 	}
 
+	async function del(uid: string): Promise<string> {
+		try {
+			await deleteDoc(doc(firestore, "usuarios", uid));
+			await delAccount(); //TODO: garantir que o login seja recente, menor que 5 minutos, segundo especificação do serviço Authentication
+			return "ok";
+		} catch (e) {
+			console.error(e);
+			return "Erro ao excluir a conta. Contate o suporte.";
+		}
+	}
+
 	return (
-		<UserContext.Provider value={{ usuerFirebase, update }}>
+		<UserContext.Provider value={{ usuerFirebase, update, del }}>
 			{children}
 		</UserContext.Provider>
 	);

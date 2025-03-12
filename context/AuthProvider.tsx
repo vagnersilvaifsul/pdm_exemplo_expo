@@ -4,6 +4,7 @@ import { Usuario } from "@/model/Usuario";
 import * as SecureStore from "expo-secure-store";
 import {
 	createUserWithEmailAndPassword,
+	deleteUser,
 	sendEmailVerification,
 	signInWithEmailAndPassword,
 	signOut,
@@ -111,6 +112,12 @@ export const AuthProvider = ({ children }: any) => {
 		}
 	}
 
+	async function delAccount(): Promise<void> {
+		if (userAuth?.user) {
+			await deleteUser(userAuth.user);
+		}
+	}
+
 	//função utilitária
 	function launchServerMessageErro(e: any): string {
 		switch (e.code) {
@@ -133,7 +140,14 @@ export const AuthProvider = ({ children }: any) => {
 
 	return (
 		<AuthContext.Provider
-			value={{ signIn, sair, recuperaCredencialdaCache, signUp, userAuth }}
+			value={{
+				signIn,
+				sair,
+				recuperaCredencialdaCache,
+				signUp,
+				userAuth,
+				delAccount,
+			}}
 		>
 			{children}
 		</AuthContext.Provider>

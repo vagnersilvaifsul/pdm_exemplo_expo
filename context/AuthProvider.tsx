@@ -1,27 +1,19 @@
+import { auth, firestore } from "@/firebase/firebaseInit";
 import { Credencial } from "@/model/types";
 import { Usuario } from "@/model/Usuario";
 import * as SecureStore from "expo-secure-store";
-import { initializeApp } from "firebase/app";
 import {
 	createUserWithEmailAndPassword,
-	getAuth,
 	sendEmailVerification,
 	signInWithEmailAndPassword,
 	signOut,
 } from "firebase/auth";
-import { doc, getFirestore, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import React, { createContext } from "react";
-import { firebaseConfig } from "../firebaseConfig";
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
 
 export const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }: any) => {
-	const auth = getAuth(app);
-	const firestore = getFirestore(app);
-
 	/*
     Cache criptografado do usuário
   */

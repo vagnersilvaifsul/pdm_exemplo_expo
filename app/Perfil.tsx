@@ -1,5 +1,6 @@
 import { UserContext } from "@/context/UserProvider";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
@@ -49,11 +50,29 @@ export default function PerfilTela({ navigation }: any) {
 	const [dialogErroVisivel, setDialogErroVisivel] = useState(false);
 	const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
 	const [mensagem, setMensagem] = useState({ tipo: "", mensagem: "" });
+	const { update } = useContext(UserContext);
 
 	useEffect(() => {}, []);
 
 	async function atualizaPerfil(data: Usuario) {
-		alert("Desenvolver a comunicação com o BaaS para o update do perfil");
+		setRequisitando(true);
+		setAtualizando(true);
+		data.uid = usuerFirebase.uid;
+		const msg = await update(data);
+		if (msg === "ok") {
+			setMensagem({
+				tipo: "ok",
+				mensagem: "Show! Seu perfil foi atualizado com sucesso.",
+			});
+			setDialogErroVisivel(true);
+			setRequisitando(false);
+			setAtualizando(false);
+		} else {
+			setMensagem({ tipo: "erro", mensagem: msg });
+			setDialogErroVisivel(true);
+			setRequisitando(false);
+			setAtualizando(false);
+		}
 	}
 
 	function avisarDaExclusaoPermanenteDaConta() {
@@ -247,7 +266,7 @@ export default function PerfilTela({ navigation }: any) {
 				onDismiss={() => {
 					setDialogErroVisivel(false);
 					if (mensagem.tipo === "ok") {
-						navigation.goBack();
+						router.back();
 					}
 				}}
 			>

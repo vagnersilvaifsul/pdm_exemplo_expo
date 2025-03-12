@@ -1,6 +1,6 @@
 import { firestore } from "@/firebase/firebaseInit";
 import { Usuario } from "@/model/Usuario";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 
@@ -42,8 +42,21 @@ export const UserProvider = ({ children }: any) => {
 		}
 	}
 
+	async function update(usuario: Usuario): Promise<string> {
+		try {
+			await setDoc(doc(firestore, "usuarios", usuario.uid), {
+				usuario,
+			});
+			setUserFirebase(usuario);
+			return "ok";
+		} catch (e) {
+			console.error(e);
+			return "Erro ao atualizar o usuário. Contate o suporte.";
+		}
+	}
+
 	return (
-		<UserContext.Provider value={{ usuerFirebase }}>
+		<UserContext.Provider value={{ usuerFirebase, update }}>
 			{children}
 		</UserContext.Provider>
 	);

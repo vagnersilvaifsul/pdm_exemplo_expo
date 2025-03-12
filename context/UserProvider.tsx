@@ -25,7 +25,6 @@ export const UserProvider = ({ children }: any) => {
 			const docSnap = await getDoc(
 				doc(firestore, "usuarios", userAuth.user.uid)
 			);
-			console.log(docSnap.data());
 			if (docSnap.exists()) {
 				let userData = docSnap.data();
 				const usuario: Usuario = {
@@ -37,7 +36,6 @@ export const UserProvider = ({ children }: any) => {
 					perfil: userData.perfil,
 				};
 				setUserFirebase(usuario);
-				console.log(usuario);
 			}
 		} catch (e) {
 			console.error("UserProvider, getUser: " + e);
@@ -46,8 +44,14 @@ export const UserProvider = ({ children }: any) => {
 
 	async function update(usuario: Usuario): Promise<string> {
 		try {
+			console.log(usuario);
+
 			await setDoc(doc(firestore, "usuarios", usuario.uid), {
-				usuario,
+				curso: usuario.curso,
+				email: usuario.email,
+				nome: usuario.nome,
+				perfil: usuario.perfil,
+				urlFoto: usuario.urlFoto,
 			});
 			setUserFirebase(usuario);
 			return "ok";

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { firestore } from "@/firebase/firebaseInit";
 import { Usuario } from "@/model/Usuario";
 import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
@@ -44,8 +45,6 @@ export const UserProvider = ({ children }: any) => {
 
 	async function update(usuario: Usuario): Promise<string> {
 		try {
-			console.log(usuario);
-
 			await setDoc(doc(firestore, "usuarios", usuario.uid), {
 				curso: usuario.curso,
 				email: usuario.email,

@@ -27,7 +27,7 @@ const schema = yup
 	})
 	.required();
 
-export default function PerfilTela({ navigation }: any) {
+export default function Perfil({ navigation }: any) {
 	const theme = useTheme();
 	const { usuerFirebase } = useContext<Usuario>(UserContext);
 	const {

@@ -1,5 +1,6 @@
+import { UserContext } from "@/context/UserProvider";
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { Button, Dialog, Text, TextInput, useTheme } from "react-native-paper";
@@ -47,10 +48,11 @@ export default function PerfilTela({ navigation }: any) {
 	const [dialogErroVisivel, setDialogErroVisivel] = useState(false);
 	const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
 	const [mensagem, setMensagem] = useState({ tipo: "", mensagem: "" });
-	const [urlDevice, setUrlDevice] = useState<string | undefined>("");
+	const { getUser } = useContext(UserContext);
 
 	async function atualizaPerfil(data: Usuario) {
-		alert("Desenvolver a comunicação com o BaaS para o Update do perfil");
+		const usuario = await getUser();
+		console.log(usuario);
 	}
 
 	function avisarDaExclusaoPermanenteDaConta() {

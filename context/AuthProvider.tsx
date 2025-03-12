@@ -7,13 +7,15 @@ import {
 	sendEmailVerification,
 	signInWithEmailAndPassword,
 	signOut,
+	UserCredential,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import React, { createContext } from "react";
+import React, { createContext, useState } from "react";
 
 export const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }: any) => {
+	const [userAuth, setUserAuth] = useState<UserCredential>();
 	/*
     Cache criptografado do usuário
   */
@@ -89,6 +91,7 @@ export const AuthProvider = ({ children }: any) => {
 			if (!userCredencial.user.emailVerified) {
 				return "Você precisa verificar seu email para continuar.";
 			}
+			setUserAuth(userCredencial);
 			armazenaCredencialnaCache(credencial);
 			return "ok";
 		} catch (error: any) {
@@ -130,7 +133,7 @@ export const AuthProvider = ({ children }: any) => {
 
 	return (
 		<AuthContext.Provider
-			value={{ signIn, sair, recuperaCredencialdaCache, signUp }}
+			value={{ signIn, sair, recuperaCredencialdaCache, signUp, userAuth }}
 		>
 			{children}
 		</AuthContext.Provider>

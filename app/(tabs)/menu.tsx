@@ -28,7 +28,7 @@ export default function Menu() {
 				left={() => (
 					<List.Icon color={theme.colors.primary} icon="smart-card-outline" />
 				)}
-				onPress={() => alert("em desenvolvimento")}
+				onPress={() => router.push("../Perfil")}
 			/>
 			<Divider />
 			<List.Item

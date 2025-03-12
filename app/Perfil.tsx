@@ -1,6 +1,6 @@
 import { UserContext } from "@/context/UserProvider";
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { Button, Dialog, Text, TextInput, useTheme } from "react-native-paper";
@@ -28,16 +28,17 @@ const schema = yup
 
 export default function PerfilTela({ navigation }: any) {
 	const theme = useTheme();
+	const { usuerFirebase } = useContext<Usuario>(UserContext);
 	const {
 		control,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<any>({
 		defaultValues: {
-			nome: "Nome do usuário",
-			email: "email@email.com",
-			curso: "curso",
-			perfil: "aluno",
+			nome: usuerFirebase.nome,
+			email: usuerFirebase.email,
+			curso: usuerFirebase.curso,
+			perfil: usuerFirebase.perfil,
 		},
 		mode: "onSubmit",
 		resolver: yupResolver(schema),
@@ -48,11 +49,11 @@ export default function PerfilTela({ navigation }: any) {
 	const [dialogErroVisivel, setDialogErroVisivel] = useState(false);
 	const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
 	const [mensagem, setMensagem] = useState({ tipo: "", mensagem: "" });
-	const { getUser } = useContext(UserContext);
+
+	useEffect(() => {}, []);
 
 	async function atualizaPerfil(data: Usuario) {
-		const usuario = await getUser();
-		console.log(usuario);
+		alert("Desenvolver a comunicação com o BaaS para o update do perfil");
 	}
 
 	function avisarDaExclusaoPermanenteDaConta() {
@@ -60,7 +61,7 @@ export default function PerfilTela({ navigation }: any) {
 	}
 
 	async function excluirConta() {
-		alert("Desenvolver a comunicação com o BaaS para o Update do perfil");
+		alert("Desenvolver a comunicação com o BaaS para o delete do perfil");
 	}
 
 	return (

@@ -1,35 +1,50 @@
 import { firestore } from "@/firebase/firebaseInit";
+import { Usuario } from "@/model/Usuario";
 import { doc, getDoc } from "firebase/firestore";
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 
 export const UserContext = createContext({});
 
 export const UserProvider = ({ children }: any) => {
 	const { userAuth } = useContext(AuthContext);
+	const [usuerFirebase, setUserFirebase] = useState<Usuario | null>(null);
+
+	useEffect(() => {
+		if (userAuth) {
+			getUser();
+		}
+	}, [userAuth]);
 
 	//busca os detalhes do usuário
-	async function getUser(): Promise<any> {
+	async function getUser(): Promise<void> {
 		try {
 			if (!userAuth.user) {
-				return null;
+				return;
 			}
 			const docSnap = await getDoc(
 				doc(firestore, "usuarios", userAuth.user.uid)
 			);
 			if (docSnap.exists()) {
 				let userData = docSnap.data();
-				userData.uid = docSnap.id;
-				return userData;
+				const usuario: Usuario = {
+					uid: docSnap.id,
+					email: userData.email,
+					nome: userData.nome,
+					urlFoto: userData.urlFoto,
+					curso: userData.curso,
+					perfil: userData.perfil,
+				};
+				setUserFirebase(usuario);
 			}
-			return null;
 		} catch (e) {
 			console.error("UserProvider, getUser: " + e);
-			return null;
 		}
 	}
 
 	return (
-		<UserContext.Provider value={{ getUser }}>{children}</UserContext.Provider>
+		<UserContext.Provider value={{ usuerFirebase }}>
+			{children}
+		</UserContext.Provider>
 	);
 };

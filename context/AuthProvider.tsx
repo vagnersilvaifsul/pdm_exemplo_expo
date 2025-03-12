@@ -15,7 +15,7 @@ import React, { createContext, useState } from "react";
 export const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }: any) => {
-	const [userAuth, setUserAuth] = useState<UserCredential>();
+	const [userAuth, setUserAuth] = useState<UserCredential | null>(null);
 	/*
     Cache criptografado do usuário
   */

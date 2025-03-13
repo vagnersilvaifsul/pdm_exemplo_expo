@@ -21,7 +21,6 @@ export default function PreloadScreen() {
 			//se tem credenciais armazenadas tenta logar
 			const mensagem = await signIn(credencial);
 			if (mensagem === "ok") {
-				//await buscaUsuario(); //TODO: isso está desenvolvido na branch modulo1_perfil
 				router.replace("/home");
 			} else {
 				//se não consegue logar vai para a tela de login

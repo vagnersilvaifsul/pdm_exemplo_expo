@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { useColorScheme } from "react-native";
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
 
@@ -20,12 +21,11 @@ const themeDark = {
 	...MD3DarkTheme,
 };
 
-const temaDoApp = true; //TODO: passar para Context para mudar o tema do app
-
 export default function RootLayout() {
 	const [loaded] = useFonts({
 		SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
 	});
+	const colorScheme = useColorScheme();
 
 	useEffect(() => {
 		if (loaded) {
@@ -38,7 +38,7 @@ export default function RootLayout() {
 	}
 
 	return (
-		<PaperProvider theme={temaDoApp ? themeLight : themeDark}>
+		<PaperProvider theme={colorScheme === "dark" ? themeDark : themeLight}>
 			<AuthProvider>
 				<UserProvider>
 					<StatusBar style="dark" />

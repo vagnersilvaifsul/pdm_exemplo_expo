@@ -2,8 +2,9 @@
 import { AuthContext } from "@/context/AuthProvider";
 import { router } from "expo-router";
 import { useContext, useEffect } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import { Image, StyleSheet } from "react-native";
 import { useTheme } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PreloadScreen() {
 	const theme = useTheme();
@@ -30,7 +31,7 @@ export default function PreloadScreen() {
 	}
 
 	return (
-		<View
+		<SafeAreaView
 			style={{ ...styles.container, backgroundColor: theme.colors.background }}
 		>
 			<Image
@@ -38,7 +39,7 @@ export default function PreloadScreen() {
 				source={require("../assets/images/logo512.png")}
 				accessibilityLabel="logo do app"
 			/>
-		</View>
+		</SafeAreaView>
 	);
 }
 

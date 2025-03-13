@@ -2,8 +2,9 @@
 import { AuthContext } from "@/context/AuthProvider";
 import { router } from "expo-router";
 import React, { useContext, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { Dialog, Divider, List, Text, useTheme } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Menu() {
 	const theme = useTheme();
@@ -19,7 +20,7 @@ export default function Menu() {
 	}
 
 	return (
-		<View
+		<SafeAreaView
 			style={{ ...styles.container, backgroundColor: theme.colors.background }}
 		>
 			<List.Item
@@ -64,7 +65,7 @@ export default function Menu() {
 					</Text>
 				</Dialog.Content>
 			</Dialog>
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -72,7 +73,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		paddingLeft: 20,
-		paddingTop: 50,
 		alignItems: "center",
 	},
 	textDialog: {

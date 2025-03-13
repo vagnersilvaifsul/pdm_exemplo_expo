@@ -17,7 +17,7 @@ export default function PreloadScreen() {
 
 	async function logar() {
 		const credencial = await recuperaCredencialdaCache();
-		if (credencial !== "null") {
+		if (credencial) {
 			//se tem credenciais armazenadas tenta logar
 			const mensagem = await signIn(credencial);
 			if (mensagem === "ok") {
@@ -27,6 +27,8 @@ export default function PreloadScreen() {
 				//se não consegue logar vai para a tela de login
 				router.replace("/signIn");
 			}
+		} else {
+			router.replace("/signIn");
 		}
 	}
 

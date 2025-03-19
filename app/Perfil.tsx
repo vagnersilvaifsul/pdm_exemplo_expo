@@ -1,5 +1,6 @@
 import { UserContext } from "@/context/UserProvider";
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -47,10 +48,11 @@ export default function Perfil({ navigation }: any) {
 	const [requisitando, setRequisitando] = useState(false);
 	const [atualizando, setAtualizando] = useState(false);
 	const [excluindo, setExcluindo] = useState(false);
-	const [dialogErroVisivel, setDialogErroVisivel] = useState(false);
+	const [dialogVisivel, setDialogVisivel] = useState(false);
 	const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
 	const [mensagem, setMensagem] = useState({ tipo: "", mensagem: "" });
 	const { update, del } = useContext(UserContext);
+	const [urlDevice, setUrlDevice] = useState<string | undefined>("");
 
 	useEffect(() => {}, []);
 
@@ -66,12 +68,12 @@ export default function Perfil({ navigation }: any) {
 				tipo: "ok",
 				mensagem: "Show! Seu perfil foi atualizado com sucesso.",
 			});
-			setDialogErroVisivel(true);
+			setDialogVisivel(true);
 			setRequisitando(false);
 			setAtualizando(false);
 		} else {
 			setMensagem({ tipo: "erro", mensagem: msg });
-			setDialogErroVisivel(true);
+			setDialogVisivel(true);
 			setRequisitando(false);
 			setAtualizando(false);
 		}
@@ -90,10 +92,30 @@ export default function Perfil({ navigation }: any) {
 			router.replace("/signIn");
 		} else {
 			setMensagem({ tipo: "erro", mensagem: "ops! algo deu errado" });
-			setDialogErroVisivel(true);
+			setDialogVisivel(true);
 			setRequisitando(false);
 			setExcluindo(false);
 		}
+	}
+
+	async function buscaNaGaleria() {
+		let result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ["images", "videos"],
+			allowsEditing: true,
+			aspect: [4, 3],
+			quality: 1,
+		});
+
+		if (!result.canceled) {
+			const path = result.assets[0].uri;
+			setUrlDevice(path); //armazena a uri para a imagem no device
+		} else {
+			setMensagem({ tipo: "ok", mensagem: "Ok, você cancelou." });
+		}
+	}
+
+	function tiraFoto() {
+		alert("Em desensolvimento.");
 	}
 
 	return (
@@ -104,7 +126,13 @@ export default function Perfil({ navigation }: any) {
 				<>
 					<Image
 						style={styles.image}
-						source={require("../assets/images/person.png")}
+						source={
+							urlDevice !== ""
+								? { uri: urlDevice }
+								: usuerFirebase.urlFoto !== ""
+									? { uri: usuerFirebase.urlFoto }
+									: require("../assets/images/person.png")
+						}
 						loadingIndicatorSource={require("../assets/images/person.png")}
 					/>
 					<View style={styles.divButtonsImage}>
@@ -112,11 +140,7 @@ export default function Perfil({ navigation }: any) {
 							style={styles.buttonImage}
 							mode="outlined"
 							icon="image"
-							onPress={() =>
-								alert(
-									"Isso será desenvolvido na branch modulo2_upload_imagen))"
-								)
-							}
+							onPress={buscaNaGaleria}
 						>
 							Galeria
 						</Button>
@@ -124,11 +148,7 @@ export default function Perfil({ navigation }: any) {
 							style={styles.buttonImage}
 							mode="outlined"
 							icon="camera"
-							onPress={() =>
-								alert(
-									"Isso será desenvolvido na branch modulo2_upload_imagen))"
-								)
-							}
+							onPress={tiraFoto}
 						>
 							Foto
 						</Button>
@@ -255,7 +275,7 @@ export default function Perfil({ navigation }: any) {
 			<Dialog
 				visible={dialogExcluirVisivel}
 				onDismiss={() => {
-					setDialogErroVisivel(false);
+					setDialogExcluirVisivel(false);
 				}}
 			>
 				<Dialog.Icon icon={"alert-circle-outline"} size={60} />
@@ -275,9 +295,9 @@ export default function Perfil({ navigation }: any) {
 				</Dialog.Actions>
 			</Dialog>
 			<Dialog
-				visible={dialogErroVisivel}
+				visible={dialogVisivel}
 				onDismiss={() => {
-					setDialogErroVisivel(false);
+					setDialogVisivel(false);
 					if (mensagem.tipo === "ok") {
 						router.back();
 					}

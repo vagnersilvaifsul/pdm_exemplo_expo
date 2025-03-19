@@ -109,13 +109,21 @@ export default function Perfil({ navigation }: any) {
 		if (!result.canceled) {
 			const path = result.assets[0].uri;
 			setUrlDevice(path); //armazena a uri para a imagem no device
-		} else {
-			setMensagem({ tipo: "ok", mensagem: "Ok, você cancelou." });
 		}
 	}
 
-	function tiraFoto() {
-		alert("Em desensolvimento.");
+	async function tiraFoto() {
+		let result = await ImagePicker.launchCameraAsync({
+			mediaTypes: ["images", "videos"],
+			allowsEditing: true,
+			aspect: [4, 3],
+			quality: 1,
+		});
+
+		if (!result.canceled) {
+			const path = result.assets[0].uri;
+			setUrlDevice(path); //armazena a uri para a imagem no device
+		}
 	}
 
 	return (

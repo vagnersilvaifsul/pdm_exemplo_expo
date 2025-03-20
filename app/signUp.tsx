@@ -3,11 +3,11 @@ import { Curso } from "@/model/Curso";
 import { Perfil } from "@/model/Perfil";
 import { Usuario } from "@/model/Usuario";
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-	Alert,
 	Image,
 	SafeAreaView,
 	ScrollView,
@@ -65,14 +65,13 @@ export default function SignUpScreen() {
 	const [requisitando, setRequisitando] = useState(false);
 	const [dialogVisivel, setDialogVisivel] = useState(false);
 	const [mensagem, setMensagem] = useState({ tipo: "", mensagem: "" });
+	const [urlDevice, setUrlDevice] = useState<string | undefined>("");
 
 	async function cadastrar(data: Usuario) {
 		setRequisitando(true);
-		data.urlFoto =
-			"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
 		data.curso = Curso.CSTSI;
 		data.perfil = Perfil.Aluno;
-		const msg = await signUp(data);
+		const msg = await signUp(data, urlDevice);
 		if (msg === "ok") {
 			setMensagem({
 				tipo: "ok",
@@ -87,6 +86,34 @@ export default function SignUpScreen() {
 		}
 	}
 
+	async function buscaNaGaleria() {
+		let result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ["images", "videos"],
+			allowsEditing: true,
+			aspect: [4, 3],
+			quality: 1,
+		});
+
+		if (!result.canceled) {
+			const path = result.assets[0].uri;
+			setUrlDevice(path); //armazena a uri para a imagem no device
+		}
+	}
+
+	async function tiraFoto() {
+		let result = await ImagePicker.launchCameraAsync({
+			mediaTypes: ["images", "videos"],
+			allowsEditing: true,
+			aspect: [4, 3],
+			quality: 1,
+		});
+
+		if (!result.canceled) {
+			const path = result.assets[0].uri;
+			setUrlDevice(path); //armazena a uri para a imagem no device
+		}
+	}
+
 	return (
 		<SafeAreaView
 			style={{ ...styles.container, backgroundColor: theme.colors.background }}
@@ -95,14 +122,18 @@ export default function SignUpScreen() {
 				<>
 					<Image
 						style={styles.image}
-						source={require("../assets/images/logo512.png")}
+						source={
+							urlDevice !== ""
+								? { uri: urlDevice }
+								: require("../assets/images/person.png")
+						}
 					/>
 					<View style={styles.divButtonsImage}>
 						<Button
 							style={styles.buttonImage}
 							mode="outlined"
 							icon="image"
-							onPress={() => Alert.alert("Vamos ver isso em upload de imagens")}
+							onPress={buscaNaGaleria}
 						>
 							Galeria
 						</Button>
@@ -110,7 +141,7 @@ export default function SignUpScreen() {
 							style={styles.buttonImage}
 							mode="outlined"
 							icon="camera"
-							onPress={() => Alert.alert("Vamos ver isso em upload de imagens")}
+							onPress={tiraFoto}
 						>
 							Foto
 						</Button>

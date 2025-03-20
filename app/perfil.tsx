@@ -52,7 +52,7 @@ export default function Perfil({ navigation }: any) {
 	const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
 	const [mensagem, setMensagem] = useState({ tipo: "", mensagem: "" });
 	const { update, del } = useContext(UserContext);
-	const [urlDevice, setUrlDevice] = useState<string | undefined>("");
+	const [urlDevice, setUrlDevice] = useState<string>("");
 
 	useEffect(() => {}, []);
 
@@ -60,6 +60,7 @@ export default function Perfil({ navigation }: any) {
 		setRequisitando(true);
 		setAtualizando(true);
 		data.uid = userFirestore.uid;
+		data.urlFoto = userFirestore.urlFoto;
 		const msg = await update(data, urlDevice);
 		if (msg === "ok") {
 			setMensagem({

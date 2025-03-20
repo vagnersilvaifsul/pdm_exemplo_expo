@@ -11,7 +11,7 @@ export const UserContext = createContext({});
 
 export const UserProvider = ({ children }: any) => {
 	const { userAuth, delAccount } = useContext(AuthContext);
-	const [usuerFirebase, setUserFirebase] = useState<Usuario | null>(null);
+	const [userFirestore, setUserFirestore] = useState<Usuario | null>(null);
 
 	useEffect(() => {
 		if (userAuth) {
@@ -38,7 +38,7 @@ export const UserProvider = ({ children }: any) => {
 					curso: userData.curso,
 					perfil: userData.perfil,
 				};
-				setUserFirebase(usuario);
+				setUserFirestore(usuario);
 			}
 		} catch (e) {
 			console.error("UserProvider, getUser: " + e);
@@ -61,7 +61,7 @@ export const UserProvider = ({ children }: any) => {
 				perfil: usuario.perfil,
 				urlFoto: usuario.urlFoto,
 			});
-			setUserFirebase(usuario);
+			setUserFirestore(usuario);
 			return "ok";
 		} catch (e) {
 			console.error(e);
@@ -86,7 +86,7 @@ export const UserProvider = ({ children }: any) => {
 			//2. e prepara o path onde ela deve ser salva no storage
 			const storageReference = ref(
 				storage,
-				`imagens/usuarios/${usuerFirebase?.uid}/foto.png`
+				`imagens/usuarios/${userFirestore?.uid}/foto.png`
 			);
 
 			//3. Envia para o storage
@@ -94,7 +94,7 @@ export const UserProvider = ({ children }: any) => {
 
 			//4. Retorna a URL da imagem
 			const url = await getDownloadURL(
-				ref(storage, `imagens/usuarios/${usuerFirebase?.uid}/foto.png`)
+				ref(storage, `imagens/usuarios/${userFirestore?.uid}/foto.png`)
 			);
 			return url;
 		} catch (e) {
@@ -115,7 +115,7 @@ export const UserProvider = ({ children }: any) => {
 	}
 
 	return (
-		<UserContext.Provider value={{ usuerFirebase, update, del }}>
+		<UserContext.Provider value={{ userFirestore, update, del }}>
 			{children}
 		</UserContext.Provider>
 	);

@@ -60,8 +60,6 @@ export default function Perfil({ navigation }: any) {
 		setRequisitando(true);
 		setAtualizando(true);
 		data.uid = userFirestore.uid;
-		data.urlFoto =
-			"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50"; //TODO: isso irá mudar quando desenvolver o upload de imagens
 		const msg = await update(data, urlDevice);
 		if (msg === "ok") {
 			setMensagem({

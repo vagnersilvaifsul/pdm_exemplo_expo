@@ -4,13 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-	Image,
-	SafeAreaView,
-	ScrollView,
-	StyleSheet,
-	View,
-} from "react-native";
+import { Image, ScrollView, StyleSheet, View } from "react-native";
 import {
 	Button,
 	Dialog,
@@ -19,6 +13,7 @@ import {
 	TextInput,
 	useTheme,
 } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as yup from "yup";
 
 const requiredMessage = "Campo obrigatório";

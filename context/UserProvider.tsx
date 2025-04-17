@@ -10,7 +10,7 @@ import { AuthContext } from "./AuthProvider";
 export const UserContext = createContext({});
 
 export const UserProvider = ({ children }: any) => {
-	const { userAuth, delAccount } = useContext(AuthContext);
+	const { userAuth, delAccount } = useContext<any>(AuthContext);
 	const [userFirestore, setUserFirestore] = useState<Usuario | null>(null);
 
 	useEffect(() => {

@@ -30,7 +30,7 @@ const schema = yup
 
 export default function Perfil({ navigation }: any) {
 	const theme = useTheme();
-	const { userFirestore } = useContext<Usuario>(UserContext);
+	const { userFirestore } = useContext<any>(UserContext);
 	const {
 		control,
 		handleSubmit,
@@ -51,7 +51,7 @@ export default function Perfil({ navigation }: any) {
 	const [dialogVisivel, setDialogVisivel] = useState(false);
 	const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
 	const [mensagem, setMensagem] = useState({ tipo: "", mensagem: "" });
-	const { update, del } = useContext(UserContext);
+	const { update, del } = useContext<any>(UserContext);
 	const [urlDevice, setUrlDevice] = useState<string>("");
 
 	useEffect(() => {}, []);

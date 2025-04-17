@@ -55,7 +55,7 @@ export default function SignUpScreen() {
 		mode: "onSubmit",
 		resolver: yupResolver(schema),
 	});
-	const { signUp } = useContext(AuthContext);
+	const { signUp } = useContext<any>(AuthContext);
 	const [exibirSenha, setExibirSenha] = useState(true);
 	const [requisitando, setRequisitando] = useState(false);
 	const [dialogVisivel, setDialogVisivel] = useState(false);

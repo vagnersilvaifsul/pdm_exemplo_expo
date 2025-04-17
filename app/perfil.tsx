@@ -129,7 +129,10 @@ export default function Perfil({ navigation }: any) {
 		<SafeAreaView
 			style={{ ...styles.container, backgroundColor: theme.colors.background }}
 		>
-			<ScrollView>
+			<ScrollView
+				showsHorizontalScrollIndicator={false}
+				showsVerticalScrollIndicator={false}
+			>
 				<>
 					<Image
 						style={styles.image}

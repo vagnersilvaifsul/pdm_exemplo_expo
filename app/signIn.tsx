@@ -81,7 +81,10 @@ export default function Entrar() {
 		<SafeAreaView
 			style={{ ...styles.container, backgroundColor: theme.colors.background }}
 		>
-			<ScrollView>
+			<ScrollView
+				showsHorizontalScrollIndicator={false}
+				showsVerticalScrollIndicator={false}
+			>
 				<>
 					<Image
 						style={styles.image}

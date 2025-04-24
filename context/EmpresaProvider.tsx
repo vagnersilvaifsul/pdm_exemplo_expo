@@ -3,9 +3,11 @@ import { Empresa } from "@/model/Empresa";
 import {
 	addDoc,
 	collection,
+	doc,
 	onSnapshot,
 	orderBy,
 	query,
+	setDoc,
 } from "firebase/firestore";
 import React, { createContext, useEffect, useState } from "react";
 
@@ -35,9 +37,19 @@ export const EmpresaProvider = ({ children }: any) => {
 			}
 		});
 		// insert({
-		// 	nome: "teste",
+		// 	nome: "teste 1 insert",
 		// 	tecnologias: "react, react-native",
-		// 	endereco: "Rua Teste",
+		// 	endereco: "Rua Teste 1 insert",
+		// 	latitude: -31.766453286495448,
+		// 	longitude: -52.351914793252945,
+		// 	urlFoto:
+		// 		"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50",
+		// } as Empresa);
+
+		// update("LnK6EKHZOw3QOIOcleBV", {
+		// 	nome: "teste update",
+		// 	tecnologias: "react, react-native",
+		// 	endereco: "Rua Teste update",
 		// 	latitude: -31.766453286495448,
 		// 	longitude: -52.351914793252945,
 		// 	urlFoto:
@@ -57,7 +69,13 @@ export const EmpresaProvider = ({ children }: any) => {
 		}
 	}
 
-	async function update() {}
+	async function update(uid: string, empresa: Empresa) {
+		try {
+			await setDoc(doc(firestore, "empresas", uid), empresa);
+		} catch (error) {
+			console.error("Error adding document: ", error);
+		}
+	}
 
 	async function del() {}
 

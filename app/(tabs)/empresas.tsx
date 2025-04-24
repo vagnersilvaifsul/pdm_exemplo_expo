@@ -11,7 +11,6 @@ export default function Empresas() {
 	const { empresas } = useContext<any>(EmpresaContext);
 
 	const irParaTelaEmpresa = (empresa: Empresa | null) => {
-		console.log("irParaTelaEmpresa", empresa);
 		router.push({
 			pathname: "/empresa",
 			params: { empresa: JSON.stringify(empresa) },

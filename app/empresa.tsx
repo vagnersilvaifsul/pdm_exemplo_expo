@@ -2,7 +2,7 @@ import { EmpresaContext } from "@/context/EmpresaProvider";
 import { Empresa } from "@/model/Empresa";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router, useLocalSearchParams } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { Button, Dialog, Text, TextInput, useTheme } from "react-native-paper";
@@ -24,7 +24,6 @@ const schema = yup.object().shape({
 export default function EmpresaDetalhe() {
 	const theme = useTheme();
 	const { empresa } = useLocalSearchParams();
-	const [data, setData] = useState<Empresa | null>(null);
 	const {
 		control,
 		handleSubmit,
@@ -44,16 +43,39 @@ export default function EmpresaDetalhe() {
 	const [mensagem, setMensagem] = useState({ tipo: "", mensagem: "" });
 	const [dialogErroVisivel, setDialogErroVisivel] = useState(false);
 	const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
-	const { salvar, excluir } = useContext<any>(EmpresaContext);
+	const { insert, update, del } = useContext<any>(EmpresaContext);
 	const [excluindo, setExcluindo] = useState(false);
 
-	useEffect(() => {
-		console.log(JSON.parse(empresa.toString()));
-		setData(JSON.parse(empresa.toString()));
-	}, [empresa]);
+	console.log(JSON.parse(empresa.toString()));
 
-	function atualizar() {
-		alert("Em desenvolvimento");
+	async function atualizar(value: Empresa) {
+		value.urlFoto =
+			JSON.parse(empresa.toString())?.urlFoto ||
+			"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
+		value.latitude = JSON.parse(empresa.toString())?.latitude || 0;
+		value.longitude = JSON.parse(empresa.toString())?.longitude || 0;
+		setRequisitando(true);
+		setAtualizando(true);
+		let msg = "";
+		if (JSON.parse(empresa.toString()) === null) {
+			msg = await insert(value, urlDevice);
+		} else {
+			msg = await update(JSON.parse(empresa.toString()).uid, value, urlDevice);
+		}
+		if (msg === "ok") {
+			setMensagem({
+				tipo: "ok",
+				mensagem: "Show! Operação realizada com sucesso.",
+			});
+			setDialogErroVisivel(true);
+			setRequisitando(false);
+			setAtualizando(false);
+		} else {
+			setMensagem({ tipo: "erro", mensagem: msg });
+			setDialogErroVisivel(true);
+			setRequisitando(false);
+			setAtualizando(false);
+		}
 	}
 
 	function excluirEmpresa() {
@@ -83,8 +105,9 @@ export default function EmpresaDetalhe() {
 						source={
 							urlDevice !== ""
 								? { uri: urlDevice }
-								: data && data?.urlFoto !== ""
-									? { uri: data?.urlFoto }
+								: JSON.parse(empresa.toString()) &&
+									  JSON.parse(empresa.toString())?.urlFoto !== ""
+									? { uri: JSON.parse(empresa.toString())?.urlFoto }
 									: require("../assets/images/logo512.png")
 						}
 					/>

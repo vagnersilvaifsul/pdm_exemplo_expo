@@ -64,19 +64,23 @@ export const EmpresaProvider = ({ children }: any) => {
 		};
 	}, []);
 
-	async function insert(empresa: Empresa) {
+	async function insert(empresa: Empresa, urlDevice: string) {
 		try {
 			await addDoc(collection(firestore, "empresas"), empresa);
+			return "ok";
 		} catch (error) {
 			console.error("Error adding document: ", error);
+			return "Erro, contate o administrador.";
 		}
 	}
 
-	async function update(uid: string, empresa: Empresa) {
+	async function update(uid: string, empresa: Empresa, urlDevice: string) {
 		try {
 			await setDoc(doc(firestore, "empresas", uid), empresa);
+			return "ok";
 		} catch (error) {
 			console.error("Error adding document: ", error);
+			return "Erro, contate o administrador.";
 		}
 	}
 

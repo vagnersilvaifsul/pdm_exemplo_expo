@@ -1,5 +1,6 @@
 import { EmpresaContext } from "@/context/EmpresaProvider";
 import { Empresa } from "@/model/Empresa";
+import { router } from "expo-router";
 import { useContext } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { Avatar, Card, FAB, List, useTheme } from "react-native-paper";
@@ -10,7 +11,7 @@ export default function Empresas() {
 	const { empresas } = useContext<any>(EmpresaContext);
 
 	const irParaTelaEmpresa = (empresa: Empresa | null) => {
-		alert("Em desenvolvimento");
+		router.push("/empresa");
 	};
 
 	return (

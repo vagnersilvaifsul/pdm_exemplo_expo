@@ -3,6 +3,7 @@ import { Empresa } from "@/model/Empresa";
 import {
 	addDoc,
 	collection,
+	deleteDoc,
 	doc,
 	onSnapshot,
 	orderBy,
@@ -56,6 +57,8 @@ export const EmpresaProvider = ({ children }: any) => {
 		// 		"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50",
 		// } as Empresa);
 
+		// del("LnK6EKHZOw3QOIOcleBV");
+
 		return () => {
 			unsubscribe();
 		};
@@ -77,7 +80,13 @@ export const EmpresaProvider = ({ children }: any) => {
 		}
 	}
 
-	async function del() {}
+	async function del(uid: string) {
+		try {
+			await deleteDoc(doc(firestore, "empresas", uid));
+		} catch (error) {
+			console.error("Error adding document: ", error);
+		}
+	}
 
 	return (
 		<EmpresaContext.Provider value={{ insert, update, del, empresas }}>

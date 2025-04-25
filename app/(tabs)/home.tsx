@@ -12,7 +12,6 @@ export default function HomeScreen() {
 	const [usuariosSearch, setUsuariosSearch] = useState<Usuario[]>([]);
 
 	async function SearchQuery(): Promise<void> {
-		console.log(searchQuery);
 		const result = await getUsuariosByName(searchQuery);
 		if (result.length > 0) {
 			setUsuariosSearch(result);

@@ -33,50 +33,22 @@ export const EmpresaProvider = ({ children }: any) => {
 						urlFoto: doc.data().urlFoto,
 					});
 				});
-				console.log("empresas", data);
 				setEmpresas(data);
 			}
 		});
-		// insert({
-		// 	nome: "teste 1 insert",
-		// 	tecnologias: "react, react-native",
-		// 	endereco: "Rua Teste 1 insert",
-		// 	latitude: -31.766453286495448,
-		// 	longitude: -52.351914793252945,
-		// 	urlFoto:
-		// 		"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50",
-		// } as Empresa);
-
-		// update("LnK6EKHZOw3QOIOcleBV", {
-		// 	nome: "teste update",
-		// 	tecnologias: "react, react-native",
-		// 	endereco: "Rua Teste update",
-		// 	latitude: -31.766453286495448,
-		// 	longitude: -52.351914793252945,
-		// 	urlFoto:
-		// 		"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50",
-		// } as Empresa);
-
-		// del("LnK6EKHZOw3QOIOcleBV");
 
 		return () => {
 			unsubscribe();
 		};
 	}, []);
 
-	async function insert(empresa: Empresa, urlDevice: string) {
+	async function save(empresa: Empresa, urlDevice: string) {
 		try {
-			await addDoc(collection(firestore, "empresas"), empresa);
-			return "ok";
-		} catch (error) {
-			console.error("Error adding document: ", error);
-			return "Erro, contate o administrador.";
-		}
-	}
-
-	async function update(uid: string, empresa: Empresa, urlDevice: string) {
-		try {
-			await setDoc(doc(firestore, "empresas", uid), empresa);
+			if (empresa.uid) {
+				await setDoc(doc(firestore, "empresas", empresa.uid), empresa); //update
+			} else {
+				await addDoc(collection(firestore, "empresas"), empresa); //insert
+			}
 			return "ok";
 		} catch (error) {
 			console.error("Error adding document: ", error);
@@ -93,7 +65,7 @@ export const EmpresaProvider = ({ children }: any) => {
 	}
 
 	return (
-		<EmpresaContext.Provider value={{ insert, update, del, empresas }}>
+		<EmpresaContext.Provider value={{ save, del, empresas }}>
 			{children}
 		</EmpresaContext.Provider>
 	);

@@ -43,12 +43,13 @@ export default function EmpresaDetalhe() {
 	const [mensagem, setMensagem] = useState({ tipo: "", mensagem: "" });
 	const [dialogErroVisivel, setDialogErroVisivel] = useState(false);
 	const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
-	const { insert, update, del } = useContext<any>(EmpresaContext);
+	const { save, del } = useContext<any>(EmpresaContext);
 	const [excluindo, setExcluindo] = useState(false);
 
 	console.log(JSON.parse(empresa.toString()));
 
-	async function atualizar(value: Empresa) {
+	async function salvar(value: Empresa) {
+		value.uid = JSON.parse(empresa.toString())?.uid || null;
 		value.urlFoto =
 			JSON.parse(empresa.toString())?.urlFoto ||
 			"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
@@ -56,12 +57,7 @@ export default function EmpresaDetalhe() {
 		value.longitude = JSON.parse(empresa.toString())?.longitude || 0;
 		setRequisitando(true);
 		setAtualizando(true);
-		let msg = "";
-		if (JSON.parse(empresa.toString()) === null) {
-			msg = await insert(value, urlDevice);
-		} else {
-			msg = await update(JSON.parse(empresa.toString()).uid, value, urlDevice);
-		}
+		const msg = await save(value, urlDevice);
 		if (msg === "ok") {
 			setMensagem({
 				tipo: "ok",
@@ -202,7 +198,7 @@ export default function EmpresaDetalhe() {
 					<Button
 						style={styles.button}
 						mode="contained"
-						onPress={handleSubmit(atualizar)}
+						onPress={handleSubmit(salvar)}
 						loading={requisitando}
 						disabled={requisitando}
 					>

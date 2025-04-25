@@ -56,11 +56,14 @@ export const EmpresaProvider = ({ children }: any) => {
 		}
 	}
 
-	async function del(uid: string) {
+	async function del(uid: string): Promise<string> {
 		try {
+			console.log("excluindo empresa", uid);
 			await deleteDoc(doc(firestore, "empresas", uid));
+			return "ok";
 		} catch (error) {
 			console.error("Error adding document: ", error);
+			return "Erro, contate o administrador.";
 		}
 	}
 

@@ -46,7 +46,7 @@ export default function EmpresaDetalhe() {
 	const { save, del } = useContext<any>(EmpresaContext);
 	const [excluindo, setExcluindo] = useState(false);
 
-	console.log(JSON.parse(empresa.toString()));
+	// console.log(JSON.parse(empresa.toString()));
 
 	async function salvar(value: Empresa) {
 		value.uid = JSON.parse(empresa.toString())?.uid || null;
@@ -74,8 +74,25 @@ export default function EmpresaDetalhe() {
 		}
 	}
 
-	function excluirEmpresa() {
-		alert("Em desenvolvimento");
+	async function excluirEmpresa() {
+		setDialogExcluirVisivel(false);
+		setRequisitando(true);
+		setExcluindo(true);
+		const msg = await del(JSON.parse(empresa.toString()).uid);
+		if (msg === "ok") {
+			setDialogErroVisivel(true);
+			setRequisitando(false);
+			setAtualizando(false);
+			setMensagem({
+				tipo: "ok",
+				mensagem: "A empresa foi excluída com sucesso.",
+			});
+		} else {
+			setMensagem({ tipo: "erro", mensagem: "ops! algo deu errado" });
+			setDialogErroVisivel(true);
+			setRequisitando(false);
+			setExcluindo(false);
+		}
 	}
 
 	function avisarDaExclusaoPermanenteDoRegistro() {
@@ -204,15 +221,17 @@ export default function EmpresaDetalhe() {
 					>
 						{!atualizando ? "Salvar" : "Salvando"}
 					</Button>
-					<Button
-						style={styles.buttonOthers}
-						mode="outlined"
-						onPress={handleSubmit(avisarDaExclusaoPermanenteDoRegistro)}
-						loading={requisitando}
-						disabled={requisitando}
-					>
-						{!excluindo ? "Excluir" : "Excluindo"}
-					</Button>
+					{JSON.parse(empresa.toString())?.uid && (
+						<Button
+							style={styles.buttonOthers}
+							mode="outlined"
+							onPress={handleSubmit(avisarDaExclusaoPermanenteDoRegistro)}
+							loading={requisitando}
+							disabled={requisitando}
+						>
+							{!excluindo ? "Excluir" : "Excluindo"}
+						</Button>
+					)}
 				</>
 			</ScrollView>
 			<Dialog

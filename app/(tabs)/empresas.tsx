@@ -1,21 +1,44 @@
 import { EmpresaContext } from "@/context/EmpresaProvider";
 import { Empresa } from "@/model/Empresa";
 import { router } from "expo-router";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
-import { Avatar, Card, FAB, List, useTheme } from "react-native-paper";
+import {
+	Avatar,
+	Card,
+	FAB,
+	List,
+	Searchbar,
+	useTheme,
+} from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Empresas() {
 	const theme = useTheme();
-	const { empresas } = useContext<any>(EmpresaContext);
+	const { empresas, getEmpresasByName } = useContext<any>(EmpresaContext);
+	const [searchQuery, setSearchQuery] = useState<string>("");
+	const [empresasSearch, setEmpresasSearch] = useState<Empresa[]>([]);
 
-	const irParaTelaEmpresa = (empresa: Empresa | null) => {
+	function irParaTelaEmpresa(empresa: Empresa | null) {
 		router.push({
 			pathname: "/empresa",
 			params: { empresa: JSON.stringify(empresa) },
 		});
-	};
+	}
+
+	async function SearchQuery(): Promise<void> {
+		console.log("searchQuery", searchQuery);
+		const result = await getEmpresasByName(searchQuery);
+		console.log("result", result);
+		if (result.length > 0) {
+			setEmpresasSearch(result);
+		}
+	}
+
+	function clearSearch() {
+		setSearchQuery("");
+		setEmpresasSearch([]);
+	}
 
 	return (
 		<SafeAreaView
@@ -27,22 +50,60 @@ export default function Empresas() {
 				<List.Subheader style={styles.subhearder}>
 					Lista de Empresas
 				</List.Subheader>
+				<Searchbar
+					style={{
+						...styles.searchBar,
+						backgroundColor: theme.colors.background,
+					}}
+					onChangeText={(query) => setSearchQuery(query)}
+					onSubmitEditing={SearchQuery}
+					onClearIconPress={clearSearch}
+					value={searchQuery}
+				/>
 				<ScrollView>
-					{empresas.map((empresa: Empresa, key: number) => (
-						<Card
-							key={key}
-							style={{ ...styles.card, borderColor: theme.colors.secondary }}
-							onPress={() => irParaTelaEmpresa(empresa)}
-						>
-							<Card.Title
-								title={empresa.nome}
-								subtitle={empresa.tecnologias}
-								left={() => (
-									<Avatar.Image size={40} source={{ uri: empresa.urlFoto }} />
-								)}
-							/>
-						</Card>
-					))}
+					{empresasSearch.length > 0
+						? empresasSearch.map((empresa: Empresa, key: number) => (
+								<Card
+									key={key}
+									style={{
+										...styles.card,
+										borderColor: theme.colors.secondary,
+									}}
+									onPress={() => irParaTelaEmpresa(empresa)}
+								>
+									<Card.Title
+										title={empresa.nome}
+										subtitle={empresa.tecnologias}
+										left={() => (
+											<Avatar.Image
+												size={40}
+												source={{ uri: empresa.urlFoto }}
+											/>
+										)}
+									/>
+								</Card>
+							))
+						: empresas.map((empresa: Empresa, key: number) => (
+								<Card
+									key={key}
+									style={{
+										...styles.card,
+										borderColor: theme.colors.secondary,
+									}}
+									onPress={() => irParaTelaEmpresa(empresa)}
+								>
+									<Card.Title
+										title={empresa.nome}
+										subtitle={empresa.tecnologias}
+										left={() => (
+											<Avatar.Image
+												size={40}
+												source={{ uri: empresa.urlFoto }}
+											/>
+										)}
+									/>
+								</Card>
+							))}
 				</ScrollView>
 			</List.Section>
 			<FAB
@@ -77,5 +138,9 @@ const styles = StyleSheet.create({
 		margin: 16,
 		right: 0,
 		bottom: 0,
+	},
+	searchBar: {
+		marginBottom: 10,
+		borderWidth: 1,
 	},
 });

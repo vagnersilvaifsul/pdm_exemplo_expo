@@ -5,10 +5,12 @@ import {
 	collection,
 	deleteDoc,
 	doc,
+	getDocs,
 	onSnapshot,
 	orderBy,
 	query,
 	setDoc,
+	where,
 } from "firebase/firestore";
 import React, { createContext, useEffect, useState } from "react";
 
@@ -66,8 +68,38 @@ export const EmpresaProvider = ({ children }: any) => {
 		}
 	}
 
+	async function getEmpresasByName(nome: string): Promise<Empresa[]> {
+		try {
+			let data: Empresa[] = [];
+			const statment = query(
+				collection(firestore, "empresas"),
+				where("nome", "in", [nome]),
+				orderBy("nome", "asc")
+			);
+
+			const querySnapshot = await getDocs(statment);
+			if (querySnapshot) {
+				querySnapshot.forEach((doc) => {
+					data.push({
+						uid: doc.id,
+						nome: doc.data().nome,
+						tecnologias: doc.data().tecnologias,
+						endereco: doc.data().endereco,
+						latitude: doc.data().latitude,
+						longitude: doc.data().longitude,
+						urlFoto: doc.data().urlFoto,
+					});
+				});
+			}
+			return data;
+		} catch (error) {
+			console.error("Error getting document: ", error);
+			return [];
+		}
+	}
+
 	return (
-		<EmpresaContext.Provider value={{ save, del, empresas }}>
+		<EmpresaContext.Provider value={{ save, del, empresas, getEmpresasByName }}>
 			{children}
 		</EmpresaContext.Provider>
 	);

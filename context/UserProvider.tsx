@@ -2,7 +2,19 @@
 import { firestore, storage } from "@/firebase/firebaseInit";
 import { Usuario } from "@/model/Usuario";
 import * as ImageManipulator from "expo-image-manipulator";
-import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
+import {
+	collection,
+	deleteDoc,
+	doc,
+	endAt,
+	getDoc,
+	getDocs,
+	onSnapshot,
+	orderBy,
+	query,
+	setDoc,
+	startAt,
+} from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthProvider";
@@ -12,12 +24,37 @@ export const UserContext = createContext({});
 export const UserProvider = ({ children }: any) => {
 	const { userAuth, delAccount } = useContext<any>(AuthContext);
 	const [userFirestore, setUserFirestore] = useState<Usuario | null>(null);
+	const [usuarios, setUsuarios] = useState<Usuario[]>([]);
 
 	useEffect(() => {
 		if (userAuth) {
 			getUser();
 		}
 	}, [userAuth]);
+
+	useEffect(() => {
+		const q = query(collection(firestore, "usuarios"), orderBy("nome", "asc"));
+		const unsubscribe = onSnapshot(q, (querySnapshot) => {
+			if (querySnapshot) {
+				let data: Usuario[] = [];
+				querySnapshot.forEach((doc) => {
+					data.push({
+						uid: doc.id,
+						email: doc.data().email,
+						nome: doc.data().nome,
+						curso: doc.data().curso,
+						perfil: doc.data().perfil,
+						urlFoto: doc.data().urlFoto,
+					});
+				});
+				setUsuarios(data);
+			}
+		});
+
+		return () => {
+			unsubscribe();
+		};
+	}, []);
 
 	//busca os detalhes do usuário
 	async function getUser(): Promise<void> {
@@ -114,8 +151,38 @@ export const UserProvider = ({ children }: any) => {
 		}
 	}
 
+	async function getUsuariosByName(nome: string): Promise<Usuario[]> {
+		try {
+			let data: Usuario[] = [];
+			const ref = collection(firestore, "usuarios");
+			const q = query(
+				ref,
+				orderBy("nome"),
+				startAt(nome),
+				endAt(nome + "\uf8ff")
+			);
+			const querySnapshot = await getDocs(q);
+			querySnapshot.forEach((doc) => {
+				data.push({
+					uid: doc.id,
+					email: doc.data().email,
+					nome: doc.data().nome,
+					curso: doc.data().curso,
+					perfil: doc.data().perfil,
+					urlFoto: doc.data().urlFoto,
+				});
+			});
+			return data;
+		} catch (error) {
+			console.error("Error em getUsuariosByName: ", error);
+			return [];
+		}
+	}
+
 	return (
-		<UserContext.Provider value={{ userFirestore, update, del }}>
+		<UserContext.Provider
+			value={{ userFirestore, update, del, getUsuariosByName, usuarios }}
+		>
 			{children}
 		</UserContext.Provider>
 	);

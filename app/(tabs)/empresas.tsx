@@ -27,9 +27,7 @@ export default function Empresas() {
 	}
 
 	async function SearchQuery(): Promise<void> {
-		console.log("searchQuery", searchQuery);
 		const result = await getEmpresasByName(searchQuery);
-		console.log("result", result);
 		if (result.length > 0) {
 			setEmpresasSearch(result);
 		}

@@ -5,12 +5,13 @@ import {
 	collection,
 	deleteDoc,
 	doc,
+	endAt,
 	getDocs,
 	onSnapshot,
 	orderBy,
 	query,
 	setDoc,
-	where,
+	startAt,
 } from "firebase/firestore";
 import React, { createContext, useEffect, useState } from "react";
 
@@ -53,7 +54,7 @@ export const EmpresaProvider = ({ children }: any) => {
 			}
 			return "ok";
 		} catch (error) {
-			console.error("Error adding document: ", error);
+			console.error("Error em save: ", error);
 			return "Erro, contate o administrador.";
 		}
 	}
@@ -63,7 +64,7 @@ export const EmpresaProvider = ({ children }: any) => {
 			await deleteDoc(doc(firestore, "empresas", uid));
 			return "ok";
 		} catch (error) {
-			console.error("Error adding document: ", error);
+			console.error("Error em  del: ", error);
 			return "Erro, contate o administrador.";
 		}
 	}
@@ -71,29 +72,28 @@ export const EmpresaProvider = ({ children }: any) => {
 	async function getEmpresasByName(nome: string): Promise<Empresa[]> {
 		try {
 			let data: Empresa[] = [];
-			const statment = query(
-				collection(firestore, "empresas"),
-				where("nome", "in", [nome]),
-				orderBy("nome", "asc")
+			const ref = collection(firestore, "empresas");
+			const q = query(
+				ref,
+				orderBy("nome"),
+				startAt(nome),
+				endAt(nome + "\uf8ff")
 			);
-
-			const querySnapshot = await getDocs(statment);
-			if (querySnapshot) {
-				querySnapshot.forEach((doc) => {
-					data.push({
-						uid: doc.id,
-						nome: doc.data().nome,
-						tecnologias: doc.data().tecnologias,
-						endereco: doc.data().endereco,
-						latitude: doc.data().latitude,
-						longitude: doc.data().longitude,
-						urlFoto: doc.data().urlFoto,
-					});
+			const querySnapshot = await getDocs(q);
+			querySnapshot.forEach((doc) => {
+				data.push({
+					uid: doc.id,
+					nome: doc.data().nome,
+					tecnologias: doc.data().tecnologias,
+					endereco: doc.data().endereco,
+					latitude: doc.data().latitude,
+					longitude: doc.data().longitude,
+					urlFoto: doc.data().urlFoto,
 				});
-			}
+			});
 			return data;
 		} catch (error) {
-			console.error("Error getting document: ", error);
+			console.error("Error em getEmpresasByName: ", error);
 			return [];
 		}
 	}

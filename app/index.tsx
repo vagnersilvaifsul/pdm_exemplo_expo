@@ -1,10 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AuthContext } from "@/context/AuthProvider";
-import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { Image, Platform, StyleSheet } from "react-native";
 import { useTheme } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -27,92 +26,71 @@ Notifications.setNotificationHandler({
 export default function PreloadScreen() {
 	const theme = useTheme();
 	const { recuperaCredencialdaCache, signIn } = useContext<any>(AuthContext);
-	const [expoPushToken, setExpoPushToken] = useState("");
-	const [notification, setNotification] = useState<
-		Notifications.Notification | undefined
-	>(undefined);
 	const notificationListener = useRef<Notifications.EventSubscription>();
 	const responseListener = useRef<Notifications.EventSubscription>();
+	const lastNotificationResponse = Notifications.useLastNotificationResponse();
+
+	console.log("lastNotificationResponse");
+	console.log(lastNotificationResponse);
+	console.log(lastNotificationResponse?.notification.request.content.data.rota);
 
 	useEffect(() => {
 		//ao montar o componente tenta logar com as credenciais da cache
 		logar();
 
-		registerForPushNotificationsAsync()
-			.then((token) => setExpoPushToken(token ?? ""))
-			.catch((error: any) => setExpoPushToken(`${error}`));
+		//2. Registra o dispositivo para receber notificações
+		registerForPushNotificationsAsync();
 
-		//4. Gerenciar notificações recebidas
+		//4. Responda aos toques de notificação quando o app está primeiro plano
 		notificationListener.current =
 			Notifications.addNotificationReceivedListener((notification) => {
-				setNotification(notification);
+				console.log("addNotificationReceivedListener");
 				console.log(notification);
+				console.log(notification.request.content.data.rota);
 			});
 
-		//5. Responda aos toques de notificação
+		//5. Responda aos toques de notificação quando o app está em segundo plano ou fechado
 		responseListener.current =
 			Notifications.addNotificationResponseReceivedListener((response) => {
+				console.log("addNotificationResponseReceivedListener");
 				console.log(response);
 			});
 
 		return () => {
-			notificationListener.current &&
-				Notifications.removeNotificationSubscription(
-					notificationListener.current
-				);
-			responseListener.current &&
-				Notifications.removeNotificationSubscription(responseListener.current);
+			// Limpa os listeners quando o componente é desmontado
+			// Isso é importante para evitar vazamentos de memória e garantir que os listeners não continuem ativos após o componente ser desmontado.
+			notificationListener.current?.remove();
+			responseListener.current?.remove();
 		};
 	}, []);
 
-	async function registerForPushNotificationsAsync() {
+	async function registerForPushNotificationsAsync(): Promise<void> {
 		if (Platform.OS === "android") {
 			//Configura o canal de notificação para Android
 			Notifications.setNotificationChannelAsync("default", {
 				name: "default",
 				importance: Notifications.AndroidImportance.MAX,
 				vibrationPattern: [0, 250, 250, 250],
-				lightColor: "#FF231F7C",
+				lightColor: theme.colors.error,
 			});
 		}
 
-		//2. Solicitar permissões de notificação
+		//3. Solicitar permissões de notificação
 		if (Device.isDevice) {
 			const { status: existingStatus } =
 				await Notifications.getPermissionsAsync();
 			let finalStatus = existingStatus;
+
 			if (existingStatus !== "granted") {
 				const { status } = await Notifications.requestPermissionsAsync();
 				finalStatus = status;
 			}
 			if (finalStatus !== "granted") {
 				handleRegistrationError(
-					"Permissão não concedida para obter o token para push notification!"
+					"Permissão negada. Você não receberá notificações até que a permissão seja concedida."
 				);
 				return;
 			}
-			const projectId =
-				Constants?.expoConfig?.extra?.eas?.projectId ??
-				Constants?.easConfig?.projectId;
-			if (!projectId) {
-				handleRegistrationError("Project ID not found");
-			}
-			//3. Obtenha o token Expo Push
-			try {
-				const pushTokenString = (
-					await Notifications.getExpoPushTokenAsync({
-						projectId,
-					})
-				).data;
-				console.log(pushTokenString);
-				return pushTokenString;
-			} catch (e: unknown) {
-				handleRegistrationError(`${e}`);
-			}
-		} else {
-			handleRegistrationError(
-				"Must use physical device for push notifications"
-			);
 		}
 	}
 

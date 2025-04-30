@@ -28,11 +28,6 @@ export default function PreloadScreen() {
 	const { recuperaCredencialdaCache, signIn } = useContext<any>(AuthContext);
 	const notificationListener = useRef<Notifications.EventSubscription>();
 	const responseListener = useRef<Notifications.EventSubscription>();
-	const lastNotificationResponse = Notifications.useLastNotificationResponse();
-
-	console.log("lastNotificationResponse");
-	console.log(lastNotificationResponse);
-	console.log(lastNotificationResponse?.notification.request.content.data.rota);
 
 	useEffect(() => {
 		//ao montar o componente tenta logar com as credenciais da cache
@@ -105,7 +100,18 @@ export default function PreloadScreen() {
 			//se tem credenciais armazenadas tenta logar
 			const mensagem = await signIn(credencial);
 			if (mensagem === "ok") {
-				router.replace("/home");
+				const lastNotification =
+					await Notifications.getLastNotificationResponseAsync();
+				switch (lastNotification?.notification.request.content.data.rota) {
+					case "usuarios":
+						router.replace("/home");
+						break;
+					case "empresas":
+						router.replace("/empresas");
+						break;
+					default:
+						router.replace("/home");
+				}
 			} else {
 				//se não consegue logar vai para a tela de login
 				router.replace("/signIn");

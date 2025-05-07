@@ -8,8 +8,8 @@ import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
     > Vá na Guia "Constas e serviço" > Vá em "Todas as contas de serviço" e clique no link com o ícone do GCP.
     No Dashboard do GCP confira se o nome do projeto é o mesmo none que você criou no Firebase (no campo de input, acima à esquerda).
     Se você estiver no projeto correto, faça uma pesquisa por "Google Maps SDK for Android" e ative o serviço (confira se foi ativado).
-		2. Adicione a chave de API do Google Maps no arquivo app.json, como manda a documentação do react-native-maps.
-		3. Faça um rebuid do projeto com AES (gere um novo APK) e instale o APK no seu dispositivo. Ah! Lembre de deixar discponível para o git o arquivo google-services.json
+		2. Adicione a chave de API do Google Maps (que você gerou no passo 1) no arquivo app.json, como manda a documentação do react-native-maps.
+		3. Faça um rebuild do projeto com EAS (gere um novo APK) e instale o APK no seu dispositivo. Ah! Lembre de deixar disponível para o git o arquivo google-services.json
 */
 
 export default function EmpresasMap() {

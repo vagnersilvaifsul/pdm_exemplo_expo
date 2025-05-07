@@ -23,6 +23,8 @@ Notifications.setNotificationHandler({
 	7. Criar o app em modo desenvolvimento (profile development), seguindo os passos de: https://expo.dev/blog/expo-go-vs-development-builds
 */
 
+//TODO: fazer a implementação do in app messaging
+//TODO: achar o defeito dos listeners de notificação, pois eles não estão funcionando como esperado
 export default function PreloadScreen() {
 	const theme = useTheme();
 	const { recuperaCredencialdaCache, signIn } = useContext<any>(AuthContext);

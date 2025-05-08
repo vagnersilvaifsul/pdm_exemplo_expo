@@ -15,6 +15,7 @@ firebaseConfig.ts
 #Deve ser descomentado quando criar o app no profile development para testar o FCM
 #Pois, o EAS do Expo requer o arquivo google-services.json (senão falha o build)
 google-services.json
+.env.local
 
 # Native
 *.orig.*

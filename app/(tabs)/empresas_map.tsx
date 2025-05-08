@@ -1,6 +1,10 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
-import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import { EmpresaContext } from "@/context/EmpresaProvider";
+import { Empresa } from "@/model/Empresa";
+import React, { useContext, useState } from "react";
+import { StyleSheet } from "react-native";
+import MapView, { MapType, Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { Button, Icon, useTheme } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 /*
     1. Para que funcione o mapa é necessário instalar o react-native-maps e ativar o Google Maps SDK no console do GCP.
@@ -13,10 +17,60 @@ import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 */
 
 export default function EmpresasMap() {
+	const [mapType, setMapType] = useState<MapType>("satellite"); //standard, satellite
+	const { empresas } = useContext<any>(EmpresaContext);
+	const theme = useTheme();
+
+	// console.log(empresas);
+	//TODO: Verificar porque os marcadores não estão aparecendo no mapa
 	return (
-		<View style={styles.container}>
-			<MapView style={styles.map} provider={PROVIDER_GOOGLE} />
-		</View>
+		<SafeAreaView style={styles.container}>
+			<MapView
+				style={styles.map}
+				provider={PROVIDER_GOOGLE}
+				showsUserLocation={true}
+				mapType={mapType}
+				followsUserLocation={true}
+				initialRegion={{
+					//região onde deve focar o mapa na inicialização
+					latitude: -31.766453286495448,
+					longitude: -52.351914793252945,
+					latitudeDelta: 0.0015, //baseado na documentação
+					longitudeDelta: 0.00121, //baseado na documentação
+				}}
+				{...empresas.map((empresa: Empresa, key: number) => {
+					return (
+						<Marker
+							key={key}
+							coordinate={{
+								latitude: empresa.latitude,
+								longitude: empresa.longitude,
+							}}
+							title={empresa.nome}
+							description={empresa.tecnologias}
+							draggable
+						>
+							<Icon
+								source="office-building-outline"
+								color={theme.colors.primary}
+								size={35}
+							/>
+						</Marker>
+					);
+				})}
+			/>
+			<Button
+				style={styles.button}
+				mode="contained"
+				onPress={() =>
+					mapType === "standard"
+						? setMapType("satellite")
+						: setMapType("standard")
+				}
+			>
+				{mapType ? "Standard" : "satellite"}
+			</Button>
+		</SafeAreaView>
 	);
 }
 
@@ -27,5 +81,11 @@ const styles = StyleSheet.create({
 	map: {
 		width: "100%",
 		height: "100%",
+	},
+	button: {
+		position: "absolute",
+		margin: 16,
+		right: 0,
+		bottom: 0,
 	},
 });

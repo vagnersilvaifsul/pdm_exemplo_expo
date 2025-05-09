@@ -16,10 +16,20 @@ SplashScreen.preventAutoHideAsync();
 //Ampliando o tema padrão
 const themeLight = {
 	...MD3LightTheme,
+	colors: {
+		...MD3LightTheme.colors,
+		white: "#ffffff",
+		black: "#000000",
+	},
 };
 
 const themeDark = {
 	...MD3DarkTheme,
+	colors: {
+		...MD3DarkTheme.colors,
+		white: "#ffffff",
+		black: "#000000",
+	},
 };
 
 export default function RootLayout() {

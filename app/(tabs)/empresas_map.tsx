@@ -20,17 +20,16 @@ export default function EmpresasMap() {
 	const [mapType, setMapType] = useState<MapType>("satellite"); //standard, satellite
 	const { empresas } = useContext<any>(EmpresaContext);
 	const theme = useTheme();
-
 	// console.log(empresas);
-	//TODO: Verificar porque os marcadores não estão aparecendo no mapa
 	return (
 		<SafeAreaView style={styles.container}>
 			<MapView
 				style={styles.map}
 				provider={PROVIDER_GOOGLE}
-				showsUserLocation={true}
 				mapType={mapType}
 				followsUserLocation={true}
+				showsUserLocation={true}
+				showsMyLocationButton={true}
 				initialRegion={{
 					//região onde deve focar o mapa na inicialização
 					latitude: -31.766453286495448,
@@ -38,7 +37,8 @@ export default function EmpresasMap() {
 					latitudeDelta: 0.0015, //baseado na documentação
 					longitudeDelta: 0.00121, //baseado na documentação
 				}}
-				{...empresas.map((empresa: Empresa, key: number) => {
+			>
+				{empresas.map((empresa: Empresa, key: number) => {
 					return (
 						<Marker
 							key={key}
@@ -51,24 +51,34 @@ export default function EmpresasMap() {
 							draggable
 						>
 							<Icon
-								source="office-building-outline"
-								color={theme.colors.primary}
-								size={35}
+								source="office-building-marker"
+								color={
+									mapType === "standard"
+										? theme.colors.primary
+										: theme.colors.onBackground
+								}
+								size={55}
 							/>
 						</Marker>
 					);
 				})}
-			/>
+			</MapView>
 			<Button
 				style={styles.button}
-				mode="contained"
+				mode={mapType === "standard" ? "contained" : "outlined"}
+				buttonColor={
+					mapType === "standard" ? theme.colors.primary : theme.colors.white
+				}
+				textColor={
+					mapType === "standard" ? theme.colors.white : theme.colors.black
+				}
 				onPress={() =>
 					mapType === "standard"
 						? setMapType("satellite")
 						: setMapType("standard")
 				}
 			>
-				{mapType ? "Standard" : "satellite"}
+				{mapType === "standard" ? "Standard" : "satellite"}
 			</Button>
 		</SafeAreaView>
 	);
@@ -84,8 +94,8 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		position: "absolute",
-		margin: 16,
-		right: 0,
+		margin: 15,
+		alignSelf: "center",
 		bottom: 0,
 	},
 });

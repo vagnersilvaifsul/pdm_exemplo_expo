@@ -121,7 +121,7 @@ export default function EmpresaDetalhe() {
 		alert("Em desenvolvimento");
 	}
 
-	async function findEndereco(cep: string) {
+	async function buscaEndereco(cep: string) {
 		if (cep.length < 8 && !/^[0-9]{8}$/.test(cep)) {
 			//regex para validar se o CEP tem 8 dígitos e eles estão entre 0 e 9
 			return;
@@ -233,7 +233,7 @@ export default function EmpresaDetalhe() {
 								mode="outlined"
 								keyboardType="numeric"
 								returnKeyType="next"
-								onBlur={() => findEndereco(value)}
+								onBlur={() => buscaEndereco(value)}
 								onChangeText={onChange}
 								value={value}
 								right={<TextInput.Icon icon="map" />}

@@ -23,7 +23,8 @@ const schema = yup.object().shape({
 	cep: yup
 		.string()
 		.required(requiredMessage)
-		.min(8, "O CEP de deve ter 8 caracteres"),
+		.min(8, "O CEP deve ter exatamente 8 números")
+		.matches(/^[0-9]+$/, "O CEP deve conter apenas números"),
 	endereco: yup
 		.string()
 		.required(requiredMessage)
@@ -33,16 +34,16 @@ const schema = yup.object().shape({
 export default function EmpresaDetalhe() {
 	const theme = useTheme();
 	const { empresa } = useLocalSearchParams();
-	const [endereco, setEndereco] = useState<string | null>("");
 	const {
 		control,
 		handleSubmit,
 		formState: { errors },
+		setValue,
 	} = useForm<any>({
 		defaultValues: {
 			nome: JSON.parse(empresa.toString())?.nome,
 			tecnologias: JSON.parse(empresa.toString())?.tecnologias,
-			cep: JSON.parse(empresa.toString())?.cep || endereco,
+			cep: JSON.parse(empresa.toString())?.cep,
 			endereco: JSON.parse(empresa.toString())?.endereco,
 		},
 		mode: "onSubmit",
@@ -121,11 +122,23 @@ export default function EmpresaDetalhe() {
 	}
 
 	async function findEndereco(cep: string) {
+		if (cep.length < 8 && !/^[0-9]{8}$/.test(cep)) {
+			//regex para validar se o CEP tem 8 dígitos e eles estão entre 0 e 9
+			return;
+		}
 		const data = await buscarCep(cep);
-		setEndereco(JSON.parse(data).logradouro);
 		console.log("data");
 		console.log(data);
-		console.log(JSON.parse(data).logradouro);
+		if (data) {
+			console.log(JSON.parse(data).logradouro);
+			setValue("endereco", JSON.parse(data).logradouro);
+		} else {
+			setMensagem({
+				tipo: "erro",
+				mensagem: "Ops! Confira o CEP que você digitou.",
+			});
+			setDialogErroVisivel(true);
+		}
 	}
 
 	return (
@@ -216,7 +229,7 @@ export default function EmpresaDetalhe() {
 							<TextInput
 								style={styles.textinput}
 								label="CEP"
-								placeholder="Formato 96000000"
+								placeholder="Digite somente números"
 								mode="outlined"
 								keyboardType="numeric"
 								returnKeyType="next"

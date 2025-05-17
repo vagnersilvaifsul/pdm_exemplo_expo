@@ -1,5 +1,6 @@
 import { EmpresaContext } from "@/context/EmpresaProvider";
 import { Empresa } from "@/model/Empresa";
+import { buscarCep } from "@/servicos/busca_cep";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
@@ -19,11 +20,20 @@ const schema = yup.object().shape({
 		.string()
 		.required(requiredMessage)
 		.min(2, "A tecnologia deve ter ao menos 2 caracteres"),
+	cep: yup
+		.string()
+		.required(requiredMessage)
+		.min(8, "O CEP de deve ter 8 caracteres"),
+	endereco: yup
+		.string()
+		.required(requiredMessage)
+		.min(2, "Digite um endereço válido"),
 });
 
 export default function EmpresaDetalhe() {
 	const theme = useTheme();
 	const { empresa } = useLocalSearchParams();
+	const [endereco, setEndereco] = useState<string | null>("");
 	const {
 		control,
 		handleSubmit,
@@ -32,6 +42,7 @@ export default function EmpresaDetalhe() {
 		defaultValues: {
 			nome: JSON.parse(empresa.toString())?.nome,
 			tecnologias: JSON.parse(empresa.toString())?.tecnologias,
+			cep: JSON.parse(empresa.toString())?.cep || endereco,
 			endereco: JSON.parse(empresa.toString())?.endereco,
 		},
 		mode: "onSubmit",
@@ -49,29 +60,31 @@ export default function EmpresaDetalhe() {
 	// console.log(JSON.parse(empresa.toString()));
 
 	async function salvar(value: Empresa) {
-		value.uid = JSON.parse(empresa.toString())?.uid || null;
-		value.urlFoto =
-			JSON.parse(empresa.toString())?.urlFoto ||
-			"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
-		value.latitude = JSON.parse(empresa.toString())?.latitude || 0;
-		value.longitude = JSON.parse(empresa.toString())?.longitude || 0;
-		setRequisitando(true);
-		setAtualizando(true);
-		const msg = await save(value, urlDevice);
-		if (msg === "ok") {
-			setMensagem({
-				tipo: "ok",
-				mensagem: "Show! Operação realizada com sucesso.",
-			});
-			setDialogErroVisivel(true);
-			setRequisitando(false);
-			setAtualizando(false);
-		} else {
-			setMensagem({ tipo: "erro", mensagem: msg });
-			setDialogErroVisivel(true);
-			setRequisitando(false);
-			setAtualizando(false);
-		}
+		console.log(value);
+
+		// value.uid = JSON.parse(empresa.toString())?.uid || null;
+		// value.urlFoto =
+		// 	JSON.parse(empresa.toString())?.urlFoto ||
+		// 	"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
+		// value.latitude = JSON.parse(empresa.toString())?.latitude || 0;
+		// value.longitude = JSON.parse(empresa.toString())?.longitude || 0;
+		// setRequisitando(true);
+		// setAtualizando(true);
+		// const msg = await save(value, urlDevice);
+		// if (msg === "ok") {
+		// 	setMensagem({
+		// 		tipo: "ok",
+		// 		mensagem: "Show! Operação realizada com sucesso.",
+		// 	});
+		// 	setDialogErroVisivel(true);
+		// 	setRequisitando(false);
+		// 	setAtualizando(false);
+		// } else {
+		// 	setMensagem({ tipo: "erro", mensagem: msg });
+		// 	setDialogErroVisivel(true);
+		// 	setRequisitando(false);
+		// 	setAtualizando(false);
+		// }
 	}
 
 	async function excluirEmpresa() {
@@ -105,6 +118,14 @@ export default function EmpresaDetalhe() {
 
 	function tiraFoto() {
 		alert("Em desenvolvimento");
+	}
+
+	async function findEndereco(cep: string) {
+		const data = await buscarCep(cep);
+		setEndereco(JSON.parse(data).logradouro);
+		console.log("data");
+		console.log(data);
+		console.log(JSON.parse(data).logradouro);
 	}
 
 	return (
@@ -194,6 +215,29 @@ export default function EmpresaDetalhe() {
 						render={({ field: { onChange, onBlur, value } }) => (
 							<TextInput
 								style={styles.textinput}
+								label="CEP"
+								placeholder="Formato 96000000"
+								mode="outlined"
+								keyboardType="numeric"
+								returnKeyType="next"
+								onBlur={() => findEndereco(value)}
+								onChangeText={onChange}
+								value={value}
+								right={<TextInput.Icon icon="map" />}
+							/>
+						)}
+						name="cep"
+					/>
+					{errors.cep && (
+						<Text style={{ ...styles.textError, color: theme.colors.error }}>
+							{errors.cep?.message?.toString()}
+						</Text>
+					)}
+					<Controller
+						control={control}
+						render={({ field: { onChange, onBlur, value } }) => (
+							<TextInput
+								style={styles.textinput}
 								label="Endereço"
 								placeholder="Digite o endereço"
 								mode="outlined"
@@ -207,9 +251,9 @@ export default function EmpresaDetalhe() {
 						)}
 						name="endereco"
 					/>
-					{errors.nome && (
+					{errors.endereco && (
 						<Text style={{ ...styles.textError, color: theme.colors.error }}>
-							{errors.nome?.message?.toString()}
+							{errors.endereco?.message?.toString()}
 						</Text>
 					)}
 					<Button

@@ -1,6 +1,9 @@
 import { EmpresaContext } from "@/context/EmpresaProvider";
 import { Empresa } from "@/model/Empresa";
-import { buscarCep } from "@/servicos/busca_cep";
+import {
+	buscarCep,
+	buscarCoordendadasPeloEndereco,
+} from "@/servicos/apis_localizacao";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
@@ -63,8 +66,18 @@ export default function EmpresaDetalhe() {
 		value.urlFoto =
 			JSON.parse(empresa.toString())?.urlFoto ||
 			"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
-		value.latitude = JSON.parse(empresa.toString())?.latitude || 0;
-		value.longitude = JSON.parse(empresa.toString())?.longitude || 0;
+		const coordenadas = await buscarCoordenadas(value.endereco);
+		if (!coordenadas) {
+			setMensagem({
+				tipo: "erro",
+				mensagem:
+					"Ops! Não foi possível identificaar coordenadas geográficas para este endereço. Por favor, verifique se o endereço está correto.",
+			});
+			setDialogErroVisivel(true);
+			return;
+		}
+		value.latitude = coordenadas.latitude;
+		value.longitude = coordenadas.longitude;
 		setRequisitando(true);
 		setAtualizando(true);
 		const msg = await save(value, urlDevice);
@@ -117,7 +130,6 @@ export default function EmpresaDetalhe() {
 		alert("Em desenvolvimento");
 	}
 
-	//TODO: busca do endereço pelo CEP ok, agora é buscar as coordenadas pelo CEP
 	async function buscaEndereco(cep: string) {
 		if (cep.length < 8 && !/^[0-9]{8}$/.test(cep)) {
 			//regex para validar se o CEP tem 8 dígitos e eles estão entre 0 e 9
@@ -125,13 +137,36 @@ export default function EmpresaDetalhe() {
 		}
 		const data = await buscarCep(cep);
 		if (data) {
-			setValue("endereco", JSON.parse(data).logradouro);
+			setValue(
+				"endereco",
+				JSON.parse(data).logradouro +
+					" " +
+					JSON.parse(data).localidade +
+					" - " +
+					JSON.parse(data).uf
+			);
 		} else {
 			setMensagem({
 				tipo: "erro",
 				mensagem: "Ops! Confira o CEP que você digitou.",
 			});
 			setDialogErroVisivel(true);
+		}
+	}
+
+	async function buscarCoordenadas(endereco: string): Promise<any> {
+		if (!endereco.length) {
+			return null;
+		}
+		const data = await buscarCoordendadasPeloEndereco(endereco);
+		if (data) {
+			const parsedData = JSON.parse(data);
+			return {
+				latitude: parsedData.result.geocode.location.latitude,
+				longitude: parsedData.result.geocode.location.longitude,
+			};
+		} else {
+			return null;
 		}
 	}
 

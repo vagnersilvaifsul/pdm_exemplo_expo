@@ -16,6 +16,7 @@ firebaseConfig.ts
 #Pois, o EAS do Expo requer o arquivo google-services.json (senão falha o build)
 google-services.json
 .env.local
+api_keys.ts
 
 # Native
 *.orig.*

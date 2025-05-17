@@ -58,34 +58,30 @@ export default function EmpresaDetalhe() {
 	const { save, del } = useContext<any>(EmpresaContext);
 	const [excluindo, setExcluindo] = useState(false);
 
-	// console.log(JSON.parse(empresa.toString()));
-
 	async function salvar(value: Empresa) {
-		console.log(value);
-
-		// value.uid = JSON.parse(empresa.toString())?.uid || null;
-		// value.urlFoto =
-		// 	JSON.parse(empresa.toString())?.urlFoto ||
-		// 	"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
-		// value.latitude = JSON.parse(empresa.toString())?.latitude || 0;
-		// value.longitude = JSON.parse(empresa.toString())?.longitude || 0;
-		// setRequisitando(true);
-		// setAtualizando(true);
-		// const msg = await save(value, urlDevice);
-		// if (msg === "ok") {
-		// 	setMensagem({
-		// 		tipo: "ok",
-		// 		mensagem: "Show! Operação realizada com sucesso.",
-		// 	});
-		// 	setDialogErroVisivel(true);
-		// 	setRequisitando(false);
-		// 	setAtualizando(false);
-		// } else {
-		// 	setMensagem({ tipo: "erro", mensagem: msg });
-		// 	setDialogErroVisivel(true);
-		// 	setRequisitando(false);
-		// 	setAtualizando(false);
-		// }
+		value.uid = JSON.parse(empresa.toString())?.uid || null;
+		value.urlFoto =
+			JSON.parse(empresa.toString())?.urlFoto ||
+			"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
+		value.latitude = JSON.parse(empresa.toString())?.latitude || 0;
+		value.longitude = JSON.parse(empresa.toString())?.longitude || 0;
+		setRequisitando(true);
+		setAtualizando(true);
+		const msg = await save(value, urlDevice);
+		if (msg === "ok") {
+			setMensagem({
+				tipo: "ok",
+				mensagem: "Show! Operação realizada com sucesso.",
+			});
+			setDialogErroVisivel(true);
+			setRequisitando(false);
+			setAtualizando(false);
+		} else {
+			setMensagem({ tipo: "erro", mensagem: msg });
+			setDialogErroVisivel(true);
+			setRequisitando(false);
+			setAtualizando(false);
+		}
 	}
 
 	async function excluirEmpresa() {

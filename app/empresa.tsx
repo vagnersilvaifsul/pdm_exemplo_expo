@@ -121,16 +121,14 @@ export default function EmpresaDetalhe() {
 		alert("Em desenvolvimento");
 	}
 
+	//TODO: busca do endereço pelo CEP ok, agora é buscar as coordenadas pelo CEP
 	async function buscaEndereco(cep: string) {
 		if (cep.length < 8 && !/^[0-9]{8}$/.test(cep)) {
 			//regex para validar se o CEP tem 8 dígitos e eles estão entre 0 e 9
 			return;
 		}
 		const data = await buscarCep(cep);
-		console.log("data");
-		console.log(data);
 		if (data) {
-			console.log(JSON.parse(data).logradouro);
 			setValue("endereco", JSON.parse(data).logradouro);
 		} else {
 			setMensagem({

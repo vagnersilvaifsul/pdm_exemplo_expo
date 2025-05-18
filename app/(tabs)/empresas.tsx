@@ -24,6 +24,7 @@ export default function Empresas() {
 			pathname: "/empresa",
 			params: { empresa: JSON.stringify(empresa) },
 		});
+		clearSearch();
 	}
 
 	async function SearchQuery(): Promise<void> {

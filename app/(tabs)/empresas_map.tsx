@@ -55,7 +55,7 @@ export default function EmpresasMap() {
 								color={
 									mapType === "standard"
 										? theme.colors.primary
-										: theme.colors.onBackground
+										: theme.colors.black
 								}
 								size={55}
 							/>

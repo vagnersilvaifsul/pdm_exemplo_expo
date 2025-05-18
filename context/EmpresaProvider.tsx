@@ -48,8 +48,10 @@ export const EmpresaProvider = ({ children }: any) => {
 
 	async function save(empresa: Empresa, urlDevice: string) {
 		try {
-			if (empresa.uid) {
-				await setDoc(doc(firestore, "empresas", empresa.uid), empresa); //update
+			const uid = empresa.uid;
+			delete empresa.uid; //evita que a uid seja salva no banco
+			if (uid) {
+				await setDoc(doc(firestore, "empresas", uid), empresa); //update
 			} else {
 				await addDoc(collection(firestore, "empresas"), empresa); //insert
 			}

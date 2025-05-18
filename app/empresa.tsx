@@ -265,7 +265,12 @@ export default function EmpresaDetalhe() {
 								onBlur={() => buscaEndereco(value)}
 								onChangeText={onChange}
 								value={value}
-								right={<TextInput.Icon icon="map" />}
+								right={
+									<TextInput.Icon
+										icon="map"
+										onPress={() => buscaEndereco(value)}
+									/>
+								}
 							/>
 						)}
 						name="cep"

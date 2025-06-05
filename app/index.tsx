@@ -37,6 +37,7 @@ export default function PreloadScreen() {
 
 		//2. Registra o dispositivo para receber notificações
 		registerForPushNotificationsAsync();
+		sendNotification();
 
 		//4. Responda aos toques de notificação quando o app está primeiro plano
 		notificationListener.current =
@@ -95,6 +96,19 @@ export default function PreloadScreen() {
 		alert(errorMessage);
 		throw new Error(errorMessage);
 	}
+
+	const sendNotification = () => {
+		Notifications.scheduleNotificationAsync({
+			content: {
+				title: "🧪 Título In App",
+				body: "Este é o corpo da Notificação In App!!!.",
+			},
+			trigger: {
+				type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+				seconds: 1,
+			},
+		});
+	};
 
 	async function logar() {
 		const credencial = await recuperaCredencialdaCache();

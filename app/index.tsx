@@ -54,6 +54,9 @@ export default function PreloadScreen() {
 				console.log(response);
 			});
 
+		//8. Inscrever o app em um tópico do FCM (o Expo não suporta tópicos :-( . Nós teríamos que ejetar para CLI onde funciona sem nenhuma dificuldade)
+		//Notifications.subscribeToTopicAsync("todos"); //Aguardando suporte do Expo para tópicos
+
 		return () => {
 			// Limpa os listeners quando o componente é desmontado
 			// Isso é importante para evitar vazamentos de memória e garantir que os listeners não continuem ativos após o componente ser desmontado.

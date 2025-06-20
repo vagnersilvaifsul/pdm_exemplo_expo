@@ -1,5 +1,6 @@
 import { AuthProvider } from "@/context/AuthProvider";
 import { EmpresaProvider } from "@/context/EmpresaProvider";
+import { FcmProvider } from "@/context/FcmProvider";
 import { UserProvider } from "@/context/UserProvider";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -50,24 +51,26 @@ export default function RootLayout() {
 
 	return (
 		<PaperProvider theme={colorScheme === "dark" ? themeDark : themeLight}>
-			<AuthProvider>
-				<UserProvider>
-					<EmpresaProvider>
-						<StatusBar style="dark" />
-						<Stack
-							screenOptions={{
-								headerShown: false,
-							}}
-						>
-							<Stack.Screen name="signIn" />
-							<Stack.Screen name="signUp" />
-							<Stack.Screen name="recuperarSenha" />
-							<Stack.Screen name="perfil" />
-							<Stack.Screen name="empresa" />
-						</Stack>
-					</EmpresaProvider>
-				</UserProvider>
-			</AuthProvider>
+			<FcmProvider>
+				<AuthProvider>
+					<UserProvider>
+						<EmpresaProvider>
+							<StatusBar style="dark" />
+							<Stack
+								screenOptions={{
+									headerShown: false,
+								}}
+							>
+								<Stack.Screen name="signIn" />
+								<Stack.Screen name="signUp" />
+								<Stack.Screen name="recuperarSenha" />
+								<Stack.Screen name="perfil" />
+								<Stack.Screen name="empresa" />
+							</Stack>
+						</EmpresaProvider>
+					</UserProvider>
+				</AuthProvider>
+			</FcmProvider>
 		</PaperProvider>
 	);
 }

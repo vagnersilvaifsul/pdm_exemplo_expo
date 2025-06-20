@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AuthContext } from "@/context/AuthProvider";
+import { FcmContext } from "@/context/FcmProvider";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
@@ -19,17 +20,17 @@ Notifications.setNotificationHandler({
 
 /*
 	Outros passos devem ser dados, são eles:
-	6. Configuração do Firebase no projeto (envolve obter o google-services.json e configurar o app.json)
-	7. Criar o app em modo desenvolvimento (profile development), seguindo os passos de: https://expo.dev/blog/expo-go-vs-development-builds
+	7. Configuração do Firebase no projeto (envolve obter o google-services.json e configurar o app.json)
+	8. Criar o app em modo desenvolvimento (profile development), seguindo os passos de: https://expo.dev/blog/expo-go-vs-development-builds
 */
 
-//TODO: fazer a implementação do in app messaging
 //TODO: achar o defeito dos listeners de notificação, pois eles não estão funcionando como esperado
 export default function PreloadScreen() {
 	const theme = useTheme();
 	const { recuperaCredencialdaCache, signIn } = useContext<any>(AuthContext);
 	const notificationListener = useRef<Notifications.EventSubscription>();
 	const responseListener = useRef<Notifications.EventSubscription>();
+	const { cadastrarTokenDispositivoNoFirestore } = useContext<any>(FcmContext);
 
 	useEffect(() => {
 		//ao montar o componente tenta logar com as credenciais da cache
@@ -54,8 +55,10 @@ export default function PreloadScreen() {
 				console.log(response);
 			});
 
-		//8. Inscrever o app em um tópico do FCM (o Expo não suporta tópicos :-( . Nós teríamos que ejetar para CLI onde funciona sem nenhuma dificuldade)
+		//6. Inscrever o app em um tópico do FCM (o Expo não suporta tópicos :-( . Nós teríamos que ejetar para CLI onde funciona sem nenhuma dificuldade)
 		//Notifications.subscribeToTopicAsync("todos"); //Aguardando suporte do Expo para tópicos
+		//6. Para contornar a limitação do Expo, vamos cadastrar o token do dispositivo no Firestore e fazer a segmentação pelas Cloud Functions.
+		cadastrarTokenDispositivoNoFirestore();
 
 		return () => {
 			// Limpa os listeners quando o componente é desmontado

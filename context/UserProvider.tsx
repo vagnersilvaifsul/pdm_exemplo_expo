@@ -91,13 +91,19 @@ export const UserProvider = ({ children }: any) => {
 				}
 				usuario.urlFoto = urlStorage;
 			}
-			await setDoc(doc(firestore, "usuarios", usuario.uid), {
-				curso: usuario.curso,
-				email: usuario.email,
-				nome: usuario.nome,
-				perfil: usuario.perfil,
-				urlFoto: usuario.urlFoto,
-			});
+			await setDoc(
+				doc(firestore, "usuarios", usuario.uid),
+				{
+					curso: usuario.curso,
+					email: usuario.email,
+					nome: usuario.nome,
+					perfil: usuario.perfil,
+					urlFoto: usuario.urlFoto,
+				},
+				{
+					merge: true,
+				}
+			);
 			setUserFirestore(usuario);
 			return "ok";
 		} catch (e) {

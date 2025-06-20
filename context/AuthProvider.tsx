@@ -82,7 +82,8 @@ export const AuthProvider = ({ children }: any) => {
 				};
 				await setDoc(
 					doc(firestore, "usuarios", userCredential.user.uid),
-					usuarioFirestore
+					usuarioFirestore,
+					{ merge: true }
 				);
 			} else {
 				return "Confira se você digitou o email e a senha.";

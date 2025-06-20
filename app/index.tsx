@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AuthContext } from "@/context/AuthProvider";
-import { FcmContext } from "@/context/FcmProvider";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
@@ -30,7 +29,6 @@ export default function PreloadScreen() {
 	const { recuperaCredencialdaCache, signIn } = useContext<any>(AuthContext);
 	const notificationListener = useRef<Notifications.EventSubscription>();
 	const responseListener = useRef<Notifications.EventSubscription>();
-	const { cadastrarTokenDispositivoNoFirestore } = useContext<any>(FcmContext);
 
 	useEffect(() => {
 		//ao montar o componente tenta logar com as credenciais da cache
@@ -58,7 +56,7 @@ export default function PreloadScreen() {
 		//6. Inscrever o app em um tópico do FCM (o Expo não suporta tópicos :-( . Nós teríamos que ejetar para CLI onde funciona sem nenhuma dificuldade)
 		//Notifications.subscribeToTopicAsync("todos"); //Aguardando suporte do Expo para tópicos
 		//6. Para contornar a limitação do Expo, vamos cadastrar o token do dispositivo no Firestore e fazer a segmentação pelas Cloud Functions.
-		cadastrarTokenDispositivoNoFirestore();
+		//Veja a chamada cadastrarTokenDispositivoNoFirestore() no FcmProvider.tsx para ver esta implementação.
 
 		return () => {
 			// Limpa os listeners quando o componente é desmontado

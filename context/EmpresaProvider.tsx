@@ -51,7 +51,9 @@ export const EmpresaProvider = ({ children }: any) => {
 			const uid = empresa.uid;
 			delete empresa.uid; //evita que a uid seja salva no banco
 			if (uid) {
-				await setDoc(doc(firestore, "empresas", uid), empresa); //update
+				await setDoc(doc(firestore, "empresas", uid), empresa, {
+					merge: true,
+				}); //update
 			} else {
 				await addDoc(collection(firestore, "empresas"), empresa); //insert
 			}

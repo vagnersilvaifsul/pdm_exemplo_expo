@@ -51,8 +51,8 @@ export default function RootLayout() {
 
 	return (
 		<PaperProvider theme={colorScheme === "dark" ? themeDark : themeLight}>
-			<FcmProvider>
-				<AuthProvider>
+			<AuthProvider>
+				<FcmProvider>
 					<UserProvider>
 						<EmpresaProvider>
 							<StatusBar style="dark" />
@@ -69,8 +69,8 @@ export default function RootLayout() {
 							</Stack>
 						</EmpresaProvider>
 					</UserProvider>
-				</AuthProvider>
-			</FcmProvider>
+				</FcmProvider>
+			</AuthProvider>
 		</PaperProvider>
 	);
 }

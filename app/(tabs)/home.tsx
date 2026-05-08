@@ -1,9 +1,13 @@
 import { UserContext } from "@/context/UserProvider";
 import { Usuario } from "@/model/Usuario";
 import { useContext, useState } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import {
+	KeyboardAvoidingView,
+	Platform,
+	ScrollView,
+	StyleSheet,
+} from "react-native";
 import { Avatar, Card, List, Searchbar, useTheme } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
 	const theme = useTheme();
@@ -32,7 +36,8 @@ export default function HomeScreen() {
 	}
 
 	return (
-		<SafeAreaView
+		<KeyboardAvoidingView
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
 			style={{ ...styles.container, backgroundColor: theme.colors.background }}
 		>
 			<List.Section
@@ -97,7 +102,7 @@ export default function HomeScreen() {
 							))}
 				</ScrollView>
 			</List.Section>
-		</SafeAreaView>
+		</KeyboardAvoidingView>
 	);
 }
 

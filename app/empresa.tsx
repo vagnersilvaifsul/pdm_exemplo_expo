@@ -8,9 +8,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Image, ScrollView, StyleSheet, View } from "react-native";
+import {
+	Image,
+	KeyboardAvoidingView,
+	Platform,
+	ScrollView,
+	StyleSheet,
+	View,
+} from "react-native";
 import { Button, Dialog, Text, TextInput, useTheme } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
 import * as yup from "yup";
 
 const requiredMessage = "Campo obrigatório";
@@ -143,7 +149,7 @@ export default function EmpresaDetalhe() {
 					" " +
 					JSON.parse(data).localidade +
 					" - " +
-					JSON.parse(data).uf
+					JSON.parse(data).uf,
 			);
 		} else {
 			setMensagem({
@@ -171,7 +177,8 @@ export default function EmpresaDetalhe() {
 	}
 
 	return (
-		<SafeAreaView
+		<KeyboardAvoidingView
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
 			style={{ ...styles.container, backgroundColor: theme.colors.background }}
 		>
 			<ScrollView>
@@ -374,7 +381,7 @@ export default function EmpresaDetalhe() {
 					</Text>
 				</Dialog.Content>
 			</Dialog>
-		</SafeAreaView>
+		</KeyboardAvoidingView>
 	);
 }
 

@@ -4,7 +4,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Image, ScrollView, StyleSheet, View } from "react-native";
+import {
+	Image,
+	KeyboardAvoidingView,
+	Platform,
+	ScrollView,
+	StyleSheet,
+	View,
+} from "react-native";
 import {
 	Button,
 	Dialog,
@@ -13,7 +20,6 @@ import {
 	TextInput,
 	useTheme,
 } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
 import * as yup from "yup";
 
 const requiredMessage = "Campo obrigatório";
@@ -39,7 +45,7 @@ const schema = yup
 			.required(requiredMessage)
 			.matches(
 				/^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[$*&@#])[0-9a-zA-Z$*&@#]{8,}$/,
-				"A senha deve conter ao menos uma letra maiúscula, uma letra minúscula, um númeral, um caractere especial e um total de 8 caracteres"
+				"A senha deve conter ao menos uma letra maiúscula, uma letra minúscula, um númeral, um caractere especial e um total de 8 caracteres",
 			),
 	})
 	.required();
@@ -78,7 +84,8 @@ export default function Entrar() {
 	}
 
 	return (
-		<SafeAreaView
+		<KeyboardAvoidingView
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
 			style={{ ...styles.container, backgroundColor: theme.colors.background }}
 		>
 			<ScrollView
@@ -193,7 +200,7 @@ export default function Entrar() {
 					</Text>
 				</Dialog.Content>
 			</Dialog>
-		</SafeAreaView>
+		</KeyboardAvoidingView>
 	);
 }
 

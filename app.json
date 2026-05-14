@@ -13,7 +13,7 @@
 		},
 		"android": {
 			"package": "com.pdm_exemplo_expo",
-			"googleServicesFile": "./google-services.json",
+			"googleServicesFile": "process.env.GOOGLE_SERVICES_FILE",
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/images/adaptive-icon.png",
 				"backgroundColor": "#ffffff"

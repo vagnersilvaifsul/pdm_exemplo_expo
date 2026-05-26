@@ -3,7 +3,7 @@ import { AuthContext } from "@/context/AuthProvider";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect } from "react";
 import { Image, Platform, StyleSheet } from "react-native";
 import { useTheme } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,16 +19,12 @@ Notifications.setNotificationHandler({
 
 /*
 	Outros passos devem ser dados, são eles:
-	7. Configuração do Firebase no projeto (envolve obter o google-services.json e configurar o app.json)
-	8. Criar o app em modo desenvolvimento (profile development), seguindo os passos de: https://expo.dev/blog/expo-go-vs-development-builds
+	5. Configuração do Firebase no projeto (envolve obter o google-services.json e configurar o app.json para app.config.js)
+	6. Criar o app em modo desenvolvimento (profile development), seguindo os passos de: https://expo.dev/blog/expo-go-vs-development-builds
 */
-
-//TODO: achar o defeito dos listeners de notificação, pois eles não estão funcionando como esperado
 export default function PreloadScreen() {
 	const theme = useTheme();
 	const { recuperaCredencialdaCache, signIn } = useContext<any>(AuthContext);
-	const notificationListener = useRef<Notifications.EventSubscription>();
-	const responseListener = useRef<Notifications.EventSubscription>();
 
 	useEffect(() => {
 		//ao montar o componente tenta logar com as credenciais da cache
@@ -38,32 +34,10 @@ export default function PreloadScreen() {
 		registerForPushNotificationsAsync();
 		sendNotification();
 
-		//4. Responda aos toques de notificação quando o app está primeiro plano
-		notificationListener.current =
-			Notifications.addNotificationReceivedListener((notification) => {
-				console.log("addNotificationReceivedListener");
-				console.log(notification);
-				console.log(notification.request.content.data.rota);
-			});
-
-		//5. Responda aos toques de notificação quando o app está em segundo plano ou fechado
-		responseListener.current =
-			Notifications.addNotificationResponseReceivedListener((response) => {
-				console.log("addNotificationResponseReceivedListener");
-				console.log(response);
-			});
-
-		//6. Inscrever o app em um tópico do FCM (o Expo não suporta tópicos :-( . Nós teríamos que ejetar para CLI onde funciona sem nenhuma dificuldade)
+		//4. Inscrever o app em um tópico do FCM (o Expo não suporta tópicos :-( . Nós teríamos que ejetar para CLI onde funciona sem nenhuma dificuldade)
 		//Notifications.subscribeToTopicAsync("todos"); //Aguardando suporte do Expo para tópicos
-		//6. Para contornar a limitação do Expo, vamos cadastrar o token do dispositivo no Firestore e fazer a segmentação pelas Cloud Functions.
+		//4. Para contornar a limitação do Expo, vamos cadastrar o token do dispositivo no Firestore e fazer a segmentação pelas Cloud Functions.
 		//Veja a chamada cadastrarTokenDispositivoNoFirestore() no FcmProvider.tsx para ver esta implementação.
-
-		return () => {
-			// Limpa os listeners quando o componente é desmontado
-			// Isso é importante para evitar vazamentos de memória e garantir que os listeners não continuem ativos após o componente ser desmontado.
-			notificationListener.current?.remove();
-			responseListener.current?.remove();
-		};
 	}, []);
 
 	async function registerForPushNotificationsAsync(): Promise<void> {
@@ -89,7 +63,7 @@ export default function PreloadScreen() {
 			}
 			if (finalStatus !== "granted") {
 				handleRegistrationError(
-					"Permissão negada. Você não receberá notificações até que a permissão seja concedida."
+					"Permissão negada. Você não receberá notificações até que a permissão seja concedida.",
 				);
 				return;
 			}

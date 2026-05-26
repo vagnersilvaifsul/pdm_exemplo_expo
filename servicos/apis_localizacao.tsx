@@ -1,5 +1,3 @@
-import { GOOGLE_MAPS_API_KEY } from "./api_keys";
-
 export async function buscarCep(cep: string): Promise<string | null> {
 	try {
 		const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
@@ -19,10 +17,10 @@ export async function buscarCep(cep: string): Promise<string | null> {
 }
 
 export async function buscarCoordendadasPeloEndereco(
-	endereco: string
+	endereco: string,
 ): Promise<string | null> {
 	try {
-		const url = `https://addressvalidation.googleapis.com/v1:validateAddress?key=${GOOGLE_MAPS_API_KEY}`;
+		const url = `https://addressvalidation.googleapis.com/v1:validateAddress?key=${process.env.GOOGLE_MAPS_API_KEY}`;
 		const body = {
 			address: {
 				regionCode: "BR",

@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: any) => {
     Cache criptografado do usuário
   */
 	async function armazenaCredencialnaCache(
-		credencial: Credencial
+		credencial: Credencial,
 	): Promise<void> {
 		try {
 			await SecureStore.setItemAsync(
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: any) => {
 				JSON.stringify({
 					email: credencial.email,
 					senha: credencial.senha,
-				})
+				}),
 			);
 		} catch (e) {
 			console.error("AuthProvider, armazenaCredencialnaCache: " + e);
@@ -57,14 +57,14 @@ export const AuthProvider = ({ children }: any) => {
 				const userCredential = await createUserWithEmailAndPassword(
 					auth,
 					usuario.email,
-					usuario.senha
+					usuario.senha,
 				);
 				if (userCredential) {
 					await sendEmailVerification(userCredential.user);
 					if (urlDevice !== "") {
 						const urlStorage = await sendImageToStorage(
 							urlDevice,
-							userCredential.user.uid
+							userCredential.user.uid,
 						);
 						if (!urlStorage) {
 							return "Erro ao cadastrar o usuário. Contate o suporte."; //não deixa salvar ou atualizar se não realizar todos os passos para enviar a imagem para o storage
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: any) => {
 				await setDoc(
 					doc(firestore, "usuarios", userCredential.user.uid),
 					usuarioFirestore,
-					{ merge: true }
+					{ merge: true },
 				);
 			} else {
 				return "Confira se você digitou o email e a senha.";
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }: any) => {
 			const userCredencial = await signInWithEmailAndPassword(
 				auth,
 				credencial.email,
-				credencial.senha
+				credencial.senha,
 			);
 			if (!userCredencial.user.emailVerified) {
 				return "Você precisa verificar seu email para continuar.";
@@ -155,16 +155,20 @@ export const AuthProvider = ({ children }: any) => {
 	//urlDevice: qual imagem que está no device que deve ser enviada via upload
 	async function sendImageToStorage(
 		urlDevice: string,
-		uid: string
+		uid: string,
 	): Promise<string | null> {
 		try {
 			//1. Redimensiona, compacta a imagem, e a transforma em blob
-			//ImageManipulator.ImageManipulator.manipulate será o substituto de ImageManipulator.manipulateAsync
-			const imageRedimencionada = await ImageManipulator.manipulateAsync(
-				urlDevice,
-				[{ resize: { width: 150, height: 150 } }],
-				{ compress: 0.8, format: ImageManipulator.SaveFormat.PNG }
-			);
+			const context = ImageManipulator.ImageManipulator.manipulate(urlDevice);
+
+			context.resize({ width: 150, height: 150 });
+
+			const imageRef = await context.renderAsync();
+			const imageRedimencionada = await imageRef.saveAsync({
+				compress: 0.8,
+				format: ImageManipulator.SaveFormat.PNG,
+			});
+
 			const data = await fetch(imageRedimencionada?.uri);
 			const blob = await data.blob();
 
@@ -176,7 +180,7 @@ export const AuthProvider = ({ children }: any) => {
 
 			//4. Retorna a URL da imagem
 			const url = await getDownloadURL(
-				ref(storage, `imagens/usuarios/${uid}/foto.png`)
+				ref(storage, `imagens/usuarios/${uid}/foto.png`),
 			);
 			return url;
 		} catch (e) {

@@ -1,51 +1,43 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+# Learn more https://docs.expo.dev/build-reference/easignore/
 
 # dependencies
-
 node_modules/
 
 # Expo
-
 .expo/
 dist/
 web-build/
 expo-env.d.ts
 
-#Evita que chaves sejam enviadas para o git
-#firebaseConfig.ts
+# Segredos — firebaseConfig.ts NÃO é ignorado aqui de propósito (o build precisa dele)
 google-services.json
 .env
+.env.*
+!.env.example
+credentials.json
 
 # Native
-
-_.orig._
-_.jks
-_.p8
-_.p12
-_.key
-\*.mobileprovision
+*.orig.*
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
 
 # Metro
-
-.metro-health-check\*
+.metro-health-check*
 
 # debug
-
-npm-debug._
-yarn-debug._
-yarn-error.\*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
 
 # macOS
-
 .DS_Store
-\*.pem
-
-# local env files
-
-.env\*.local
 
 # typescript
-
-\*.tsbuildinfo
+*.tsbuildinfo
 
 app-example

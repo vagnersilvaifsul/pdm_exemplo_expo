@@ -24,11 +24,13 @@ export default function TabLayout() {
 				name="home"
 				options={{
 					title: "Home",
-					tabBarIcon: ({ color }) => (
+					tabBarIcon: ({ focused }) => (
 						<Icon
 							source="account-group"
-							color={theme.colors.primary}
 							size={20}
+							color={
+								focused ? theme.colors.primary : theme.colors.onSurfaceVariant
+							}
 						/>
 					),
 				}}
@@ -37,11 +39,13 @@ export default function TabLayout() {
 				name="empresas"
 				options={{
 					title: "Empresas",
-					tabBarIcon: ({ color }) => (
+					tabBarIcon: ({ focused }) => (
 						<Icon
 							source="office-building-outline"
-							color={theme.colors.primary}
 							size={20}
+							color={
+								focused ? theme.colors.primary : theme.colors.onSurfaceVariant
+							}
 						/>
 					),
 				}}
@@ -50,8 +54,14 @@ export default function TabLayout() {
 				name="empresas_map"
 				options={{
 					title: "Mapa Empresas",
-					tabBarIcon: ({ color }) => (
-						<Icon source="map" color={theme.colors.primary} size={20} />
+					tabBarIcon: ({ focused }) => (
+						<Icon
+							source="map"
+							size={20}
+							color={
+								focused ? theme.colors.primary : theme.colors.onSurfaceVariant
+							}
+						/>
 					),
 				}}
 			/>
@@ -59,8 +69,14 @@ export default function TabLayout() {
 				name="menu"
 				options={{
 					title: "Menu",
-					tabBarIcon: ({ color }) => (
-						<Icon source="menu" color={theme.colors.primary} size={20} />
+					tabBarIcon: ({ focused }) => (
+						<Icon
+							source="menu"
+							size={20}
+							color={
+								focused ? theme.colors.primary : theme.colors.onSurfaceVariant
+							}
+						/>
 					),
 				}}
 			/>

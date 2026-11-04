@@ -25,6 +25,13 @@ service cloud.firestore {
       return !(campo in dados) || dados[campo] is string;
     }
 
+    // Campo opcional: se existir, precisa ser número entre min e max
+    function numeroOpcional(dados, campo, min, max) {
+      return !(campo in dados)
+        || (dados[campo] is number
+            && dados[campo] >= min && dados[campo] <= max);
+    }
+
     // ---------- usuarios/{uid} ----------
     // Gravado no cadastro (AuthProvider.signUp), na edição do perfil
     // (UserProvider.update) e pelo FcmProvider (token_fcm).
@@ -67,6 +74,8 @@ service cloud.firestore {
     // CRUD feito pelo EmpresaProvider. A Cloud Function notificarNovaEmpresa
     // usa o Admin SDK, que não passa por estas regras.
 
+    // Coordenadas são opcionais: o app não as envia no cadastro; a Cloud
+    // Function geocodificarEmpresa as preenche depois (via Admin SDK)
     function empresaValida(dados) {
       return dados.keys().hasOnly(["nome", "tecnologias", "cep", "endereco",
                                    "latitude", "longitude", "urlFoto"])
@@ -74,10 +83,8 @@ service cloud.firestore {
         && dados.tecnologias is string
         && dados.cep is string && dados.cep.matches("^[0-9]{8}$")
         && dados.endereco is string
-        && dados.latitude is number
-        && dados.latitude >= -90 && dados.latitude <= 90
-        && dados.longitude is number
-        && dados.longitude >= -180 && dados.longitude <= 180
+        && numeroOpcional(dados, "latitude", -90, 90)
+        && numeroOpcional(dados, "longitude", -180, 180)
         && stringOpcional(dados, "urlFoto");
     }
 

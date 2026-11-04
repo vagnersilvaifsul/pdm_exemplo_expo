@@ -6,6 +6,8 @@ import * as SecureStore from "expo-secure-store";
 import {
 	createUserWithEmailAndPassword,
 	deleteUser,
+	EmailAuthProvider,
+	reauthenticateWithCredential,
 	sendEmailVerification,
 	signInWithEmailAndPassword,
 	signOut,
@@ -38,7 +40,7 @@ export const AuthProvider = ({ children }: any) => {
 		}
 	}
 
-	async function recuperaCredencialdaCache(): Promise<null | string> {
+	async function recuperaCredencialdaCache(): Promise<Credencial | null> {
 		try {
 			const credencial = await SecureStore.getItemAsync("credencial");
 			return credencial ? JSON.parse(credencial) : null;
@@ -143,9 +145,26 @@ export const AuthProvider = ({ children }: any) => {
 		}
 	}
 
+	//O deleteUser exige login recente (auth/requires-recent-login). Como o app
+	//faz login automático, a sessão pode ser antiga: reautentica com a
+	//credencial da cache antes de qualquer passo da exclusão da conta.
+	async function reautenticar(): Promise<void> {
+		const credencial = await recuperaCredencialdaCache();
+		if (!auth.currentUser || !credencial) {
+			throw new Error("Sem usuário autenticado ou credencial na cache.");
+		}
+		await reauthenticateWithCredential(
+			auth.currentUser,
+			EmailAuthProvider.credential(credencial.email, credencial.senha),
+		);
+	}
+
 	async function delAccount(): Promise<void> {
 		if (userAuth?.user) {
 			await deleteUser(userAuth.user);
+			//a conta não existe mais: limpa a credencial e o estado do login
+			await SecureStore.deleteItemAsync("credencial");
+			setUserAuth(null);
 		}
 	}
 
@@ -215,6 +234,7 @@ export const AuthProvider = ({ children }: any) => {
 				recuperaCredencialdaCache,
 				signUp,
 				userAuth,
+				reautenticar,
 				delAccount,
 			}}
 		>

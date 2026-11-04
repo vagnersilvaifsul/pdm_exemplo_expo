@@ -22,7 +22,7 @@ import { AuthContext } from "./AuthProvider";
 export const UserContext = createContext({});
 
 export const UserProvider = ({ children }: any) => {
-	const { userAuth, delAccount } = useContext<any>(AuthContext);
+	const { userAuth, reautenticar, delAccount } = useContext<any>(AuthContext);
 	const [userFirestore, setUserFirestore] = useState<Usuario | null>(null);
 	const [usuarios, setUsuarios] = useState<Usuario[]>([]);
 
@@ -156,8 +156,9 @@ export const UserProvider = ({ children }: any) => {
 
 	async function del(uid: string): Promise<string> {
 		try {
+			await reautenticar(); //antes de apagar qualquer coisa: o deleteUser exige login recente
 			await deleteDoc(doc(firestore, "usuarios", uid));
-			await delAccount(); //TODO: garantir que o login seja recente, menor que 5 minutos, segundo especificação do serviço Authentication
+			await delAccount();
 			return "ok";
 		} catch (e) {
 			console.error(e);

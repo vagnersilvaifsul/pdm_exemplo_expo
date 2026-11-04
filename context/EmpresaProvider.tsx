@@ -13,14 +13,21 @@ import {
 	setDoc,
 	startAt,
 } from "firebase/firestore";
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { AuthContext } from "./AuthProvider";
 
 export const EmpresaContext = createContext({});
 
 export const EmpresaProvider = ({ children }: any) => {
+	const { userAuth } = useContext<any>(AuthContext);
 	const [empresas, setEmpresas] = useState<Empresa[]>([]);
 
+	//só escuta a coleção com o usuário autenticado (exigência das regras do Firestore)
 	useEffect(() => {
+		if (!userAuth) {
+			setEmpresas([]);
+			return;
+		}
 		const q = query(collection(firestore, "empresas"), orderBy("nome"));
 		const unsubscribe = onSnapshot(q, (querySnapshot) => {
 			if (querySnapshot) {
@@ -44,7 +51,7 @@ export const EmpresaProvider = ({ children }: any) => {
 		return () => {
 			unsubscribe();
 		};
-	}, []);
+	}, [userAuth]);
 
 	async function save(empresa: Empresa, urlDevice: string) {
 		try {

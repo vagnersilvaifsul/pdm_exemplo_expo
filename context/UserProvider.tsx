@@ -32,7 +32,12 @@ export const UserProvider = ({ children }: any) => {
 		}
 	}, [userAuth]);
 
+	//só escuta a coleção com o usuário autenticado (exigência das regras do Firestore)
 	useEffect(() => {
+		if (!userAuth) {
+			setUsuarios([]);
+			return;
+		}
 		const q = query(collection(firestore, "usuarios"), orderBy("nome", "asc"));
 		const unsubscribe = onSnapshot(q, (querySnapshot) => {
 			if (querySnapshot) {
@@ -54,7 +59,7 @@ export const UserProvider = ({ children }: any) => {
 		return () => {
 			unsubscribe();
 		};
-	}, []);
+	}, [userAuth]);
 
 	//busca os detalhes do usuário
 	async function getUser(): Promise<void> {
@@ -133,7 +138,7 @@ export const UserProvider = ({ children }: any) => {
 			);
 
 			//3. Envia para o storage
-			await uploadBytes(storageReference, blob);
+			await uploadBytes(storageReference, blob, { contentType: "image/png" });
 
 			//4. Retorna a URL da imagem
 			const url = await getDownloadURL(

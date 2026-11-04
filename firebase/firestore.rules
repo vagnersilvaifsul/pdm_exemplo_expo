@@ -2,9 +2,95 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if
-          request.time < timestamp.date(2026, 12, 31);
+
+    // ---------- Funções auxiliares ----------
+
+    function autenticado() {
+      return request.auth != null;
+    }
+
+    // O app só deixa entrar quem verificou o email (signIn no AuthProvider),
+    // mas o Firebase Auth autentica mesmo sem a verificação. Por isso a
+    // regra também confere.
+    function verificado() {
+      return autenticado() && request.auth.token.email_verified == true;
+    }
+
+    function dono(uid) {
+      return autenticado() && request.auth.uid == uid;
+    }
+
+    // Campo opcional: se existir, precisa ser do tipo string
+    function stringOpcional(dados, campo) {
+      return !(campo in dados) || dados[campo] is string;
+    }
+
+    // ---------- usuarios/{uid} ----------
+    // Gravado no cadastro (AuthProvider.signUp), na edição do perfil
+    // (UserProvider.update) e pelo FcmProvider (token_fcm).
+
+    function usuarioValido(dados) {
+      return dados.keys().hasOnly(
+               ["email", "nome", "urlFoto", "curso", "perfil", "token_fcm"])
+        && dados.email is string
+        && dados.nome is string && dados.nome.size() > 0
+        && (!("curso" in dados) || dados.curso in ["CSTSI", "CSBD"])
+        && (!("perfil" in dados)
+            || dados.perfil in ["Aluno", "Professor", "Empresa"])
+        && stringOpcional(dados, "urlFoto")
+        && stringOpcional(dados, "token_fcm");
+    }
+
+    // Outro usuário só pode REMOVER o token_fcm (FcmProvider faz isso quando
+    // o aparelho passa a ser usado por outra conta), sem mexer em mais nada.
+    function apenasRemoveToken() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(["token_fcm"])
+        && !("token_fcm" in request.resource.data);
+    }
+
+    match /usuarios/{uid} {
+      // Lista de usuários na home e busca do token no FcmProvider
+      allow read: if verificado();
+
+      // No cadastro o email ainda não foi verificado, então basta ser o dono
+      allow create: if dono(uid) && usuarioValido(request.resource.data);
+
+      allow update: if (dono(uid) && usuarioValido(request.resource.data))
+                    || (verificado() && apenasRemoveToken());
+
+      // Exclusão da conta (UserProvider.del)
+      allow delete: if dono(uid);
+    }
+
+    // ---------- empresas/{empresaId} ----------
+    // CRUD feito pelo EmpresaProvider. A Cloud Function notificarNovaEmpresa
+    // usa o Admin SDK, que não passa por estas regras.
+
+    function empresaValida(dados) {
+      return dados.keys().hasOnly(["nome", "tecnologias", "cep", "endereco",
+                                   "latitude", "longitude", "urlFoto"])
+        && dados.nome is string && dados.nome.size() >= 2
+        && dados.tecnologias is string
+        && dados.cep is string && dados.cep.matches("^[0-9]{8}$")
+        && dados.endereco is string
+        && dados.latitude is number
+        && dados.latitude >= -90 && dados.latitude <= 90
+        && dados.longitude is number
+        && dados.longitude >= -180 && dados.longitude <= 180
+        && stringOpcional(dados, "urlFoto");
+    }
+
+    match /empresas/{empresaId} {
+      allow read: if verificado();
+      allow create, update: if verificado()
+                            && empresaValida(request.resource.data);
+      allow delete: if verificado();
+    }
+
+    // Qualquer outra coleção fica bloqueada (é o padrão, explícito aqui)
+    match /{documento=**} {
+      allow read, write: if false;
     }
   }
 }

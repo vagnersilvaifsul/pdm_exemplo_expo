@@ -2,11 +2,12 @@ import { firestore } from "@/firebase/firebaseInit";
 import * as Notifications from "expo-notifications";
 import {
 	collection,
+	deleteField,
 	doc,
 	getDocs,
 	query,
-	setDoc,
 	where,
+	writeBatch,
 } from "firebase/firestore";
 import React, { createContext, useContext, useEffect } from "react";
 import { AuthContext } from "./AuthProvider";
@@ -25,26 +26,36 @@ export const FcmProvider = ({ children }: any) => {
 	async function cadastrarTokenDispositivoNoFirestore(uid: string) {
 		try {
 			const token = await Notifications.getDevicePushTokenAsync();
-			//Primeiro verifica se o token já existe no Firestore
-			// console.log("Token do dispositivo: ", token.data);
-			// console.log("UID do usuário autenticado: ", uid);
+			//Procura os usuários que já têm este token (o aparelho pode ter sido
+			//usado por outra conta antes)
 			const q = query(
 				collection(firestore, "usuarios"),
-				where("token", "==", token.data)
+				where("token_fcm", "==", token.data)
 			);
 			const querySnapshot = await getDocs(q);
-			//Se não existir, insere o token
-			if (querySnapshot.empty) {
-				await setDoc(
-					doc(firestore, "usuarios", uid),
-					{
-						token_fcm: token.data,
-					},
-					{
-						merge: true,
-					}
-				); //update
+			//Se o token já é só deste usuário, não há nada a fazer
+			if (querySnapshot.size === 1 && querySnapshot.docs[0].id === uid) {
+				return;
 			}
+			const lote = writeBatch(firestore);
+			//Remove o token das outras contas, para o aparelho não receber
+			//notificações duplicadas nem de uma conta que já saiu dele
+			querySnapshot.docs
+				.filter((usuario) => usuario.id !== uid)
+				.forEach((usuario) =>
+					lote.update(usuario.ref, { token_fcm: deleteField() })
+				);
+			//Grava o token no usuário autenticado
+			lote.set(
+				doc(firestore, "usuarios", uid),
+				{
+					token_fcm: token.data,
+				},
+				{
+					merge: true,
+				}
+			); //update
+			await lote.commit();
 		} catch (error: any) {
 			console.error(
 				"Erro buscar o token do dispositivo no Firestore: " + error.message

@@ -7,26 +7,93 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import {setGlobalOptions} from "firebase-functions";
-// import {onRequest} from "firebase-functions/https";
-// import * as logger from "firebase-functions/logger";
+import { initializeApp } from "firebase-admin/app";
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import { getMessaging } from "firebase-admin/messaging";
+import { setGlobalOptions } from "firebase-functions";
+import * as logger from "firebase-functions/logger";
+import {
+  onDocumentCreatedWithAuthContext,
+} from "firebase-functions/v2/firestore";
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+initializeApp();
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({maxInstances: 10});
+// Mesma região do Firestore (o gatilho do banco precisa estar nela) e,
+// para controlar custos, no máximo 10 instâncias ao mesmo tempo.
+setGlobalOptions({ region: "southamerica-east1", maxInstances: 10 });
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// GATILHO: roda sozinha toda vez que um documento é CRIADO em empresas.
+// "WithAuthContext" informa também quem criou (authId), para não
+// notificar o próprio autor.
+// Erros do FCM que indicam que o token não vale mais (app desinstalado,
+// token expirado etc.). Esses tokens são apagados do Firestore.
+const TOKEN_INVALIDO = [
+	"messaging/invalid-registration-token",
+	"messaging/registration-token-not-registered",
+];
+
+// O sendEachForMulticast aceita no máximo 500 tokens por chamada.
+const TOKENS_POR_ENVIO = 500;
+
+// GATILHO: roda sozinha toda vez que um documento é CRIADO em empresas.
+// "WithAuthContext" informa também quem criou (authId), para não
+// notificar o próprio autor.
+export const notificarNovaEmpresa = onDocumentCreatedWithAuthContext(
+	"empresas/{empresaId}",
+	async (evento) => {
+		const empresa = evento.data?.data();
+		if (!empresa) return;
+
+		// Destinatários: todos os usuários que têm o app instalado, ou seja,
+		// que já tiveram o token do dispositivo gravado pelo FcmProvider.tsx
+		const db = getFirestore();
+		const usuarios = await db
+			.collection("usuarios")
+			.where("token_fcm", "!=", null)
+			.get();
+		const destinatarios = usuarios.docs.filter(
+			(usuario) => usuario.id !== evento.authId,
+		);
+		if (destinatarios.length === 0) {
+			logger.info("Nenhum dispositivo para notificar.");
+			return;
+		}
+
+		const lote = db.batch();
+		let sucessos = 0;
+		let falhas = 0;
+
+		// Envia em grupos de até 500 tokens
+		for (let inicio = 0; inicio < destinatarios.length; inicio += TOKENS_POR_ENVIO) {
+			const grupo = destinatarios.slice(inicio, inicio + TOKENS_POR_ENVIO);
+
+			// Uma mensagem para vários tokens. "notification" é o que aparece
+			// na barra; "data" vai escondido para o app (o id abre o detalhe).
+			const resposta = await getMessaging().sendEachForMulticast({
+				tokens: grupo.map((destinatario) => destinatario.get("token_fcm")),
+				notification: {
+					title: "Nova empresa",
+					body: `${empresa.nome} acaba de ser cadastrada.`,
+				},
+				data: { empresaId: evento.params.empresaId },
+				// Mesmo canal criado no app (app/index.tsx)
+				android: { priority: "high", notification: { channelId: "default" } },
+			});
+			sucessos += resposta.successCount;
+			falhas += resposta.failureCount;
+
+			// Limpeza: apaga dos usuários os tokens que o FCM recusou como inválidos
+			// (a resposta vem na mesma ordem dos tokens enviados)
+			resposta.responses.forEach((envio, i) => {
+				if (envio.error && TOKEN_INVALIDO.includes(envio.error.code)) {
+					lote.update(grupo[i].ref, { token_fcm: FieldValue.delete() });
+				}
+			});
+		}
+
+		logger.info(
+			`Notificação enviada: ${sucessos} sucesso(s), ${falhas} falha(s).`,
+		);
+		await lote.commit();
+	},
+);

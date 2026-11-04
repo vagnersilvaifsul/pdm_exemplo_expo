@@ -11,7 +11,7 @@ import {
 	signOut,
 	UserCredential,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { deleteField, doc, setDoc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import React, { createContext, useState } from "react";
 
@@ -117,11 +117,29 @@ export const AuthProvider = ({ children }: any) => {
 	async function sair(): Promise<string> {
 		try {
 			await SecureStore.deleteItemAsync("credencial");
+			await apagaTokenDispositivoNoFirestore();
 			await signOut(auth);
+			setUserAuth(null);
 			return "ok";
 		} catch (error: any) {
 			console.error(error.code, error.message);
 			return launchServerMessageErro(error);
+		}
+	}
+
+	//Remove o token deste aparelho do usuário, para que ele pare de receber
+	//notificações depois de sair. Precisa rodar antes do signOut, pois as
+	//regras do Firestore só deixam o próprio usuário alterar o seu documento.
+	async function apagaTokenDispositivoNoFirestore(): Promise<void> {
+		try {
+			if (auth.currentUser) {
+				await updateDoc(doc(firestore, "usuarios", auth.currentUser.uid), {
+					token_fcm: deleteField(),
+				});
+			}
+		} catch (e) {
+			//não impede o logout se não conseguir apagar o token
+			console.error("AuthProvider, apagaTokenDispositivoNoFirestore: " + e);
 		}
 	}
 
@@ -176,7 +194,7 @@ export const AuthProvider = ({ children }: any) => {
 			const storageReference = ref(storage, `imagens/usuarios/${uid}/foto.png`);
 
 			//3. Envia para o storage
-			await uploadBytes(storageReference, blob);
+			await uploadBytes(storageReference, blob, { contentType: "image/png" });
 
 			//4. Retorna a URL da imagem
 			const url = await getDownloadURL(

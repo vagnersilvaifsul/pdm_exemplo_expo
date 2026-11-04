@@ -12,7 +12,7 @@ export default function Menu() {
 	const [dialogVisivel, setDialogVisivel] = useState(false);
 
 	async function handleSair() {
-		if (await sair()) {
+		if ((await sair()) === "ok") {
 			router.replace("/signIn"); //Veja a branch modulo1_preload para ver como isso está funcionando
 		} else {
 			setDialogVisivel(true);

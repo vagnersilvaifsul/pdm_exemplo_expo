@@ -1,9 +1,6 @@
 import { EmpresaContext } from "@/context/EmpresaProvider";
 import { Empresa } from "@/model/Empresa";
-import {
-	buscarCep,
-	buscarCoordendadasPeloEndereco,
-} from "@/servicos/apis_localizacao";
+import { buscarCep } from "@/servicos/apis_localizacao";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
@@ -72,18 +69,6 @@ export default function EmpresaDetalhe() {
 		value.urlFoto =
 			JSON.parse(empresa.toString())?.urlFoto ||
 			"https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
-		const coordenadas = await buscarCoordenadas(value.endereco);
-		if (!coordenadas) {
-			setMensagem({
-				tipo: "erro",
-				mensagem:
-					"Ops! Não foi possível identificaar coordenadas geográficas para este endereço. Por favor, verifique se o endereço está correto.",
-			});
-			setDialogErroVisivel(true);
-			return;
-		}
-		value.latitude = coordenadas.latitude;
-		value.longitude = coordenadas.longitude;
 		setRequisitando(true);
 		setAtualizando(true);
 		const msg = await save(value, urlDevice);
@@ -157,22 +142,6 @@ export default function EmpresaDetalhe() {
 				mensagem: "Ops! Confira o CEP que você digitou.",
 			});
 			setDialogErroVisivel(true);
-		}
-	}
-
-	async function buscarCoordenadas(endereco: string): Promise<any> {
-		if (!endereco.length) {
-			return null;
-		}
-		const data = await buscarCoordendadasPeloEndereco(endereco);
-		if (data) {
-			const parsedData = JSON.parse(data);
-			return {
-				latitude: parsedData.result.geocode.location.latitude,
-				longitude: parsedData.result.geocode.location.longitude,
-			};
-		} else {
-			return null;
 		}
 	}
 

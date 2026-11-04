@@ -292,7 +292,7 @@ export default function EmpresaDetalhe() {
 						<Button
 							style={styles.buttonOthers}
 							mode="outlined"
-							onPress={handleSubmit(avisarDaExclusaoPermanenteDoRegistro)}
+							onPress={avisarDaExclusaoPermanenteDoRegistro}
 							loading={requisitando}
 							disabled={requisitando}
 						>

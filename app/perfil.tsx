@@ -281,7 +281,7 @@ export default function Perfil({ navigation }: any) {
 					<Button
 						style={styles.buttonOthers}
 						mode="outlined"
-						onPress={handleSubmit(avisarDaExclusaoPermanenteDaConta)}
+						onPress={avisarDaExclusaoPermanenteDaConta}
 						loading={requisitando}
 						disabled={requisitando}
 					>

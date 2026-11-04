@@ -105,7 +105,7 @@ export default function Perfil({ navigation }: any) {
 
 	async function buscaNaGaleria() {
 		let result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ["images", "videos"],
+			mediaTypes: ["images"],
 			allowsEditing: true,
 			aspect: [4, 3],
 			quality: 1,
@@ -119,7 +119,7 @@ export default function Perfil({ navigation }: any) {
 
 	async function tiraFoto() {
 		let result = await ImagePicker.launchCameraAsync({
-			mediaTypes: ["images", "videos"],
+			mediaTypes: ["images"],
 			allowsEditing: true,
 			aspect: [4, 3],
 			quality: 1,
@@ -189,7 +189,7 @@ export default function Perfil({ navigation }: any) {
 						)}
 						name="nome"
 					/>
-					{errors.email && (
+					{errors.nome && (
 						<Text style={{ ...styles.textError, color: theme.colors.error }}>
 							{errors.nome?.message?.toString()}
 						</Text>
@@ -242,7 +242,7 @@ export default function Perfil({ navigation }: any) {
 					/>
 					{errors.curso && (
 						<Text style={{ ...styles.textError, color: theme.colors.error }}>
-							{errors.senha?.message?.toString()}
+							{errors.curso?.message?.toString()}
 						</Text>
 					)}
 					<Controller

@@ -89,7 +89,7 @@ export default function SignUpScreen() {
 
 	async function buscaNaGaleria() {
 		let result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ["images", "videos"],
+			mediaTypes: ["images"],
 			allowsEditing: true,
 			aspect: [4, 3],
 			quality: 1,
@@ -103,7 +103,7 @@ export default function SignUpScreen() {
 
 	async function tiraFoto() {
 		let result = await ImagePicker.launchCameraAsync({
-			mediaTypes: ["images", "videos"],
+			mediaTypes: ["images"],
 			allowsEditing: true,
 			aspect: [4, 3],
 			quality: 1,

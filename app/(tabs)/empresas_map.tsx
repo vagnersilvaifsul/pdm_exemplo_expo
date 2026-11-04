@@ -39,30 +39,39 @@ export default function EmpresasMap() {
 					longitudeDelta: 0.00121, //baseado na documentação
 				}}
 			>
-				{empresas.map((empresa: Empresa, key: number) => {
-					return (
-						<Marker
-							key={key}
-							coordinate={{
-								latitude: empresa.latitude,
-								longitude: empresa.longitude,
-							}}
-							title={empresa.nome}
-							description={empresa.tecnologias}
-							draggable
-						>
-							<Icon
-								source="office-building-marker"
-								color={
-									mapType === "standard"
-										? theme.colors.primary
-										: theme.colors.black
-								}
-								size={55}
-							/>
-						</Marker>
-					);
-				})}
+				{/* Só desenha empresas que já têm coordenadas: no cadastro elas chegam
+				    sem latitude/longitude, que a Cloud Function geocodificarEmpresa
+				    preenche depois (ou não preenche, se não achar o endereço) */}
+				{empresas
+					.filter(
+						(empresa: Empresa) =>
+							typeof empresa.latitude === "number" &&
+							typeof empresa.longitude === "number",
+					)
+					.map((empresa: Empresa) => {
+						return (
+							<Marker
+								key={empresa.uid}
+								coordinate={{
+									latitude: empresa.latitude,
+									longitude: empresa.longitude,
+								}}
+								title={empresa.nome}
+								description={empresa.tecnologias}
+								draggable
+							>
+								<Icon
+									source="office-building-marker"
+									color={
+										mapType === "standard"
+											? theme.colors.primary
+											: theme.colors.black
+									}
+									size={55}
+								/>
+							</Marker>
+						);
+					})}
 			</MapView>
 			<Button
 				style={styles.button}

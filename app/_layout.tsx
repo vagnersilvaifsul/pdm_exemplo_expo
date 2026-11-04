@@ -64,7 +64,7 @@ export default function RootLayout() {
 				<FcmProvider>
 					<UserProvider>
 						<EmpresaProvider>
-							<StatusBar style="dark" />
+							<StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
 							<Stack
 								screenOptions={{
 									headerShown: false,

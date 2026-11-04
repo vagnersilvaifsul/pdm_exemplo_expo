@@ -67,14 +67,15 @@ export const notificarNovaEmpresa = onDocumentCreatedWithAuthContext(
 			const grupo = destinatarios.slice(inicio, inicio + TOKENS_POR_ENVIO);
 
 			// Uma mensagem para vários tokens. "notification" é o que aparece
-			// na barra; "data" vai escondido para o app (o id abre o detalhe).
+			// na barra; "data" vai escondido para o app: "rota" diz qual tela
+			// abrir ao tocar na notificação (app/index.tsx) e o id identifica a empresa.
 			const resposta = await getMessaging().sendEachForMulticast({
 				tokens: grupo.map((destinatario) => destinatario.get("token_fcm")),
 				notification: {
 					title: "Nova empresa",
 					body: `${empresa.nome} acaba de ser cadastrada.`,
 				},
-				data: { empresaId: evento.params.empresaId },
+				data: { rota: "empresas", empresaId: evento.params.empresaId },
 				// Mesmo canal criado no app (app/index.tsx)
 				android: { priority: "high", notification: { channelId: "default" } },
 			});

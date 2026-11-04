@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }: any) => {
 				const usuarioFirestore = {
 					email: usuario.email,
 					nome: usuario.nome,
-					urlFoto: usuario.urlFoto,
+					urlFoto: usuario.urlFoto ?? "", //sem foto: o Firestore recusa campos undefined
 					curso: usuario.curso,
 					perfil: usuario.perfil,
 				};

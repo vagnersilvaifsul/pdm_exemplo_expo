@@ -128,30 +128,41 @@ export const geocodificarEmpresa = onDocumentWritten(
 			return;
 		}
 
-		const resposta = await fetch(
-			"https://addressvalidation.googleapis.com/v1:validateAddress",
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					// A chave vai no cabeçalho (e não na URL, que aparece em logs)
-					"X-Goog-Api-Key": chaveEnderecos.value(),
-				},
-				body: JSON.stringify({
-					address: {
-						regionCode: "BR",
-						postalCode: empresa.cep,
-						addressLines: [empresa.endereco],
+		// Falha de rede ou resposta que não é JSON: registra no log e mantém as
+		// coordenadas atuais, sem derrubar a Function
+		let dados: RespostaValidacao;
+		try {
+			const resposta = await fetch(
+				"https://addressvalidation.googleapis.com/v1:validateAddress",
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						// A chave vai no cabeçalho (e não na URL, que aparece em logs)
+						"X-Goog-Api-Key": chaveEnderecos.value(),
 					},
-				}),
-			},
-		);
-		if (!resposta.ok) {
-			logger.error(`Address Validation respondeu HTTP ${resposta.status}.`);
+					body: JSON.stringify({
+						address: {
+							regionCode: "BR",
+							postalCode: empresa.cep,
+							addressLines: [empresa.endereco],
+						},
+					}),
+				},
+			);
+			if (!resposta.ok) {
+				logger.error(`Address Validation respondeu HTTP ${resposta.status}.`);
+				return; // mantém as coordenadas atuais
+			}
+
+			dados = (await resposta.json()) as RespostaValidacao;
+		} catch (erro) {
+			logger.error(
+				`Falha ao consultar a Address Validation (empresa ${evento.params.empresaId}).`,
+				erro,
+			);
 			return; // mantém as coordenadas atuais
 		}
-
-		const dados = (await resposta.json()) as RespostaValidacao;
 		const local = dados.result?.geocode?.location;
 		if (!local) {
 			logger.warn(`Sem coordenadas para a empresa ${evento.params.empresaId}.`);

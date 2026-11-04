@@ -8,12 +8,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
-import {
-	MD3DarkTheme,
-	MD3LightTheme,
-	PaperProvider,
-	useTheme,
-} from "react-native-paper";
+import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -37,10 +32,6 @@ const themeDark = {
 		black: "#000000",
 	},
 };
-
-//Tipo do tema ampliado e hook tipado para acessar as cores extras (ex.: theme.colors.white)
-export type AppTheme = typeof themeLight;
-export const useAppTheme = () => useTheme<AppTheme>();
 
 export default function RootLayout() {
 	const [loaded] = useFonts({

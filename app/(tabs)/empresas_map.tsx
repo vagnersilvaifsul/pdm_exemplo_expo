@@ -1,10 +1,9 @@
-import { useAppTheme } from "@/app/_layout";
 import { EmpresaContext } from "@/context/EmpresaProvider";
 import { Empresa } from "@/model/Empresa";
 import React, { useContext, useState } from "react";
 import { StyleSheet } from "react-native";
 import MapView, { MapType, Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import { Button, Icon } from "react-native-paper";
+import { Button, Icon, useTheme } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 /*
@@ -20,7 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function EmpresasMap() {
 	const [mapType, setMapType] = useState<MapType>("satellite"); //standard, satellite
 	const { empresas } = useContext<any>(EmpresaContext);
-	const theme = useAppTheme();
+	const theme = useTheme();
 	// console.log(empresas);
 	return (
 		<SafeAreaView style={styles.container}>

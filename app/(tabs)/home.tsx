@@ -19,6 +19,8 @@ export default function HomeScreen() {
 		const result = await getUsuariosByName(searchQuery);
 		if (result.length > 0) {
 			setUsuariosSearch(result);
+		} else {
+			setUsuariosSearch([]);
 		}
 	}
 
@@ -58,9 +60,9 @@ export default function HomeScreen() {
 				/>
 				<ScrollView>
 					{usuariosSearch.length > 0
-						? usuariosSearch.map((usuario: Usuario, key: number) => (
+						? usuariosSearch.map((usuario: Usuario) => (
 								<Card
-									key={key}
+									key={usuario.uid}
 									style={{
 										...styles.card,
 										borderColor: theme.colors.secondary,
@@ -79,9 +81,9 @@ export default function HomeScreen() {
 									/>
 								</Card>
 							))
-						: usuarios.map((usuario: Usuario, key: number) => (
+						: usuarios.map((usuario: Usuario) => (
 								<Card
-									key={key}
+									key={usuario.uid}
 									style={{
 										...styles.card,
 										borderColor: theme.colors.secondary,

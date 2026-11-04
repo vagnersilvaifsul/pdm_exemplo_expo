@@ -90,7 +90,7 @@ export const UserProvider = ({ children }: any) => {
 	async function update(usuario: Usuario, urlDevice: string): Promise<string> {
 		try {
 			if (urlDevice !== "") {
-				const urlStorage = await sendImageToStorage(urlDevice);
+				const urlStorage = await sendImageToStorage(urlDevice, usuario.uid);
 				if (!urlStorage) {
 					return "Erro ao atualizar o usuário. Contate o suporte."; //não deixa salvar ou atualizar se não realizar todos os passos para enviar a imagem para o storage
 				}
@@ -119,7 +119,10 @@ export const UserProvider = ({ children }: any) => {
 
 	//Função utilitário para envio de imagens para o serviço de Storage
 	//urlDevice: qual imagem que está no device que deve ser enviada via upload
-	async function sendImageToStorage(urlDevice: string): Promise<string | null> {
+	async function sendImageToStorage(
+		urlDevice: string,
+		uid: string,
+	): Promise<string | null> {
 		try {
 			//1. Redimensiona, compacta a imagem, e a transforma em blob
 			//ImageManipulator.ImageManipulator.manipulate será o substituto de ImageManipulator.manipulateAsync
@@ -134,7 +137,7 @@ export const UserProvider = ({ children }: any) => {
 			//2. e prepara o path onde ela deve ser salva no storage
 			const storageReference = ref(
 				storage,
-				`imagens/usuarios/${userFirestore?.uid}/foto.png`
+				`imagens/usuarios/${uid}/foto.png`
 			);
 
 			//3. Envia para o storage
@@ -142,7 +145,7 @@ export const UserProvider = ({ children }: any) => {
 
 			//4. Retorna a URL da imagem
 			const url = await getDownloadURL(
-				ref(storage, `imagens/usuarios/${userFirestore?.uid}/foto.png`)
+				ref(storage, `imagens/usuarios/${uid}/foto.png`)
 			);
 			return url;
 		} catch (e) {

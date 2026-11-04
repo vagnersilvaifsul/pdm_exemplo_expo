@@ -122,8 +122,8 @@ export default function EmpresaDetalhe() {
 	}
 
 	async function buscaEndereco(cep: string) {
-		if (cep.length < 8 && !/^[0-9]{8}$/.test(cep)) {
-			//regex para validar se o CEP tem 8 dígitos e eles estão entre 0 e 9
+		if (!cep || !/^[0-9]{8}$/.test(cep)) {
+			//campo vazio, ou o CEP não tem exatamente 8 dígitos entre 0 e 9 (regex)
 			return;
 		}
 		const data = await buscarCep(cep);

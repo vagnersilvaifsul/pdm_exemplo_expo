@@ -60,8 +60,9 @@ export default function Menu() {
 				<Dialog.Title style={styles.textDialog}>Ops!</Dialog.Title>
 				<Dialog.Content>
 					<Text style={styles.textDialog} variant="bodyLarge">
-						{`Estamos com problemas para realizar essa operação.\nPor favor,
-            contate o administrador.`}
+						{
+							"Estamos com problemas para realizar essa operação.\nPor favor, contate o administrador."
+						}
 					</Text>
 				</Dialog.Content>
 			</Dialog>
